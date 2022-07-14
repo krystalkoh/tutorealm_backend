@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const TutorSchema = new mongoose.Schema(
+const TutorsSchema = new mongoose.Schema(
   {
     email: {
       type: String,
@@ -31,6 +31,6 @@ const TutorSchema = new mongoose.Schema(
   { collection: "tutors" }
 );
 
-const Tutor = mongoose.model("Tutor", TutorSchema);
+const Tutors = mongoose.model("Tutor", TutorsSchema);
 
-module.exports = Tutor;
+module.exports = Tutors;
