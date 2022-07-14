@@ -24,6 +24,7 @@ const ParentsSchema = new mongoose.Schema(
         childName: {
           type: String,
           required: true,
+          default: "",
         },
         level: {
           type: String,
@@ -43,10 +44,11 @@ const ParentsSchema = new mongoose.Schema(
             "JC2",
           ],
           required: true,
+          default: "",
         },
-        subject: [{ type: String }],
-        time: [{ frequency: String, duration: String }],
-        rate: { type: String },
+        subject: [{ type: String, default: "" }],
+        time: [{  duration: String, frequency: String, days: String, default: "" }],
+        rate: { type: String, default: "" },
       },
     ],
   },

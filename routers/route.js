@@ -41,7 +41,7 @@ router.put("/TutorRegistration", async (req, res) => {
   }
 });
 
-//Parents-RESISTRATION
+//Parents-REGISTRATION
 router.put("/ParentRegistration", async (req, res) => {
   try {
     const user = await Parents.findOne({ email: req.body.email });
@@ -59,7 +59,6 @@ router.put("/ParentRegistration", async (req, res) => {
         phone: req.body.contact.phone,
         address: req.body.contact.address,
       },
-      children: req.body.children,
     });
     console.log("created user", createdParent);
     res.json({ status: "ok", message: "user created" });
