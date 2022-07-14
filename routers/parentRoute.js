@@ -6,43 +6,13 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 
 const router = express.Router();
-const Tutors = require("../models/TutorsSchema");
+
 const Parents = require("../models/ParentsSchema");
 
 const auth = require("../middleware/auth");
 
-//Tutors-RESISTRATION
-router.put("/TutorRegistration", async (req, res) => {
-  try {
-    const user = await Tutors.findOne({ email: req.body.email });
-    if (user) {
-      return res
-        .status(400)
-        .json({ status: "error", message: "duplicate email/username" });
-    }
-    const hash = await bcrypt.hash(req.body.password, 12); //12 times salt
-    const createdTutor = await Tutors.create({
-      email: req.body.email,
-      hash,
-      //gender: for later
-      name: req.body.name,
-      edulevel: req.body.edulevel,
-      contact: {
-        phone: req.body.contact.phone,
-        address: req.body.contact.address,
-      },
-    });
-    console.log("created user", createdTutor);
-    res.json({ status: "ok", message: "user created" });
-  } catch (error) {
-    console.log("PUT /create", error);
-    res.status(400),
-      json({ status: "error", message: "an error has occurred" });
-  }
-});
-
 //Parents-REGISTRATION
-router.put("/ParentRegistration", async (req, res) => {
+router.put("/parent/registration", async (req, res) => {
   try {
     const user = await Parents.findOne({ email: req.body.email });
     if (user) {
@@ -69,27 +39,26 @@ router.put("/ParentRegistration", async (req, res) => {
   }
 });
 
-//LOGIN
-router.post("/login", async (req, res) => {
+//PARENT LOGIN
+router.post("/parent/login", async (req, res) => {
   try {
-    //Find user
-    const tutor = await Tutors.findOne({ email: req.body.email });
-    if (!tutor) {
+    const parent = await Parents.findOne({ email: req.body.email });
+    if (!parent) {
       return res
         .status(400)
         .json({ status: "error", message: "not authorised" });
     }
 
-    const result = await bcrypt.compare(req.body.password, tutor.hash);
+    const result = await bcrypt.compare(req.body.password, parent.hash);
     if (!result) {
       console.log("username or password error");
       return res.status(401).json({ status: "error", message: "login failed" });
     }
 
     const payload = {
-      id: tutor._id,
-      email: tutor.email,
-      role: tutor.role
+      id: parent._id,
+      email: parent.email,
+      role: parent.role,
     };
 
     const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
@@ -106,19 +75,20 @@ router.post("/login", async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.log("POST /login", error); //for server
-    res.status(400).json({ status: "error", message: "login failed" }); //for client
+    console.log("POST /login", error);
+    res.status(400).json({ status: "error", message: "login failed" });
   }
 });
 
-router.post("/refresh", (req, res) => {
+router.post("/parent/refresh", (req, res) => {
   try {
     const decoded = jwt.verify(req.body.refresh, process.env.REFRESH_SECRET);
     console.log(decoded);
 
     const payload = {
-      id: decoded.id,
-      username: decoded.username,
+      id: decoded._id,
+      email: decoded.email,
+      role: decoded.role,
     };
 
     const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
@@ -146,12 +116,16 @@ router.get("/users", auth, async (req, res) => {
 
 //PARENT UPDATE (new child)
 router.patch("/newChild", async (req, res) => {
-    const parent = await Parents.findOneandUpdate(
-      // { email: req.body.email }, search by jwt
-      {$push: {children: {
-        childName: req.body.children.childName
-      }}}
-    );
-    res.json(parent);
-  });
+  const parent = await Parents.findOneandUpdate(
+    // { email: req.body.email }, search by jwt
+    {
+      $push: {
+        children: {
+          childName: req.body.children.childName,
+        },
+      },
+    }
+  );
+  res.json(parent);
+});
 module.exports = router;
