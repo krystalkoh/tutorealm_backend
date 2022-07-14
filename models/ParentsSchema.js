@@ -15,15 +15,15 @@ const ParentsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    contact: {
+      phone: { type: String, required: true },
+      address: { type: String, required: true },
+    },
     level: {
       type: String,
       required: true,
     },
     subject: [{ type: String }],
-    edulevel: {
-      type: String,
-      required: true,
-    },
     time: [{ frequency: String, duration: String }],
     rate: { type: String },
   },
