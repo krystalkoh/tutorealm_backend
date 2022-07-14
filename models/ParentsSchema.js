@@ -11,7 +11,7 @@ const ParentsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    name: {
+    parentName: {
       type: String,
       required: true,
     },
@@ -19,8 +19,15 @@ const ParentsSchema = new mongoose.Schema(
       phone: { type: String, required: true },
       address: { type: String, required: true },
     },
+    children: [{
+      childName: {
+      type: String,
+      required: true
+    },
+    }], 
     level: {
       type: String,
+      enum: ["P1", "P2", "P3", "P4", "P5", "P6", "Sec 1", "Sec 2", "Sec 3", "Sec 4", "Sec 5", "JC1", "JC2"], 
       required: true,
     },
     subject: [{ type: String }],

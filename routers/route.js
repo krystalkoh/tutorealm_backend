@@ -6,8 +6,69 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 
 const router = express.Router();
-const User = require("../models/User");
+const Tutors = require("../models/TutorsSchema");
+const Parents = require("../models/ParentsSchema");
+
 const auth = require("../middleware/auth");
+
+//Tutors-RESISTRATION
+router.put("/TutorRegistration", async (req, res) => {
+  try {
+    const user = await Tutors.findOne({ email: req.body.email });
+    if (user) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "duplicate email/username" });
+    }
+    const hash = await bcrypt.hash(req.body.password, 12); //12 times salt
+    const createdTutor = await Tutors.create({
+      email: req.body.email,
+      hash,
+      //gender: for later
+      name: req.body.name,
+      edulevel: req.body.edulevel,
+      contact: {
+        phone: req.body.contact.phone,
+        address: req.body.contact.address,
+      },
+    });
+    console.log("created user", createdTutor);
+    res.json({ status: "ok", message: "user created" });
+  } catch (error) {
+    console.log("PUT /create", error);
+    res.status(400),
+      json({ status: "error", message: "an error has occurred" });
+  }
+});
+
+//Parents-RESISTRATION
+router.put("/ParentRegistration", async (req, res) => {
+  try {
+    const user = await Parents.findOne({ email: req.body.email });
+    if (user) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "duplicate email/username" });
+    }
+    const hash = await bcrypt.hash(req.body.password, 12); //12 times salt
+    const createdParent = await Parents.create({
+      email: req.body.email,
+      hash,
+      parentName: req.body.parentName,
+      contact: {
+        phone: req.body.contact.phone,
+        address: req.body.contact.address,
+      },
+      children: req.body.children,
+    });
+    console.log("created user", createdParent);
+    res.json({ status: "ok", message: "user created" });
+  } catch (error) {
+    console.log("PUT /create", error);
+    res.status(400),
+      json({ status: "error", message: "an error has occurred" });
+  }
+});
 
 //LOGIN
 router.post("/login", async (req, res) => {
@@ -74,29 +135,6 @@ router.post("/refresh", (req, res) => {
       status: "error",
       message: "unauthorised",
     });
-  }
-});
-
-//RESISTRATION
-router.put("/create", async (req, res) => {
-  try {
-    const user = await User.findOne({ username: req.body.username });
-    if (user) {
-      return res
-        .status(400)
-        .json({ status: "error", message: "duplicate username" });
-    }
-    const hash = await bcrypt.hash(req.body.password, 12); //12 times salt
-    const createdUser = await User.create({
-      username: req.body.username,
-      hash,
-    });
-    console.log("created user", createdUser);
-    res.json({ status: "ok", message: "user created" });
-  } catch (error) {
-    console.log("PUT /create", error);
-    res.status(400),
-      json({ status: "error", message: "an error has occurred" });
   }
 });
 
