@@ -143,4 +143,14 @@ router.get("/users", auth, async (req, res) => {
   res.json(users);
 });
 
+//PARENT UPDATE (new child)
+router.patch("/newChild", async (req, res) => {
+    const parent = await Parents.findOneandUpdate(
+      // { email: req.body.email }, search by jwt
+      {$push: {children: {
+        childName: req.body.children.childName
+      }}}
+    );
+    res.json(parent);
+  });
 module.exports = router;
