@@ -17,15 +17,15 @@ const ParentsSchema = new mongoose.Schema(
     },
     level: {
       type: String,
-      required: true
+      required: true,
     },
-    subject: [{type: String}],
+    subject: [{ type: String }],
     edulevel: {
       type: String,
-      required: true
+      required: true,
     },
-    time: [{frequency: String, duration: String}],
-    rate: {type: String},
+    time: [{ frequency: String, duration: String }],
+    rate: { type: String },
   },
   { collection: "parents" }
 );
