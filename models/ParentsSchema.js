@@ -51,6 +51,7 @@ const ParentsSchema = new mongoose.Schema(
         rate: { type: String, default: "" },
       },
     ],
+    role: "Parent"
   },
   { collection: "parents" }
 );

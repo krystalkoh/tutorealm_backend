@@ -73,26 +73,27 @@ router.put("/ParentRegistration", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     //Find user
-    const user = await User.findOne({ username: req.body.username });
-    if (!user) {
+    const tutor = await Tutors.findOne({ email: req.body.email });
+    if (!tutor) {
       return res
         .status(400)
         .json({ status: "error", message: "not authorised" });
     }
 
-    const result = await bcrypt.compare(req.body.password, user.hash);
+    const result = await bcrypt.compare(req.body.password, tutor.hash);
     if (!result) {
       console.log("username or password error");
       return res.status(401).json({ status: "error", message: "login failed" });
     }
 
     const payload = {
-      id: user._id,
-      username: user.username,
+      id: tutor._id,
+      email: tutor.email,
+      role: tutor.role
     };
 
     const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
-      expiresIn: "10s",
+      expiresIn: "20m",
       jwtid: uuidv4(),
     });
 
