@@ -123,7 +123,7 @@ router.patch("/tutor/registration", auth, async (req, res) => {
 
   const updateProfile = await Tutors.findOneAndUpdate(req.body.email, {
     email: req.body.email || user.email,
-    password: req.body.password || user.password,
+    hash: bcrypt.hash(req.body.password, 12) || user.hash,
     gender: req.body.gender || user.gender,
     name: req.body.name || user.name,
     edulevel: req.body.edulevel || user.edulevel,
@@ -134,17 +134,17 @@ router.patch("/tutor/registration", auth, async (req, res) => {
   });
   res.json(updateProfile);
   //needto double check this
-  const hash = await bcrypt.hash(updateProfile.password, 12);
-  const updateHash = await Tutors.updateOne(user.hash, hash || user.hash);
+  // const hash = await bcrypt.hash(updateProfile.password, 12);
+  // const updateHash = await Tutors.updateOne(user.hash, hash || user.hash);
 });
 
 // READ APPLIED JOBS
-router.get("/tutor/applied", auth, async (req, res) => {
-  //When the value of $exists operator is set to true, then this operator matches the document that contains the specified field(including the documents where the value of that field is null).
-  const user = await Tutors.find();
-  const applied = await Tutors.find({ jobCode: { $exists: true, $ne: [] } });
-  res.json(applied);
-});
+// router.get("/tutor/applied", auth, async (req, res) => {
+//   //When the value of $exists operator is set to true, then this operator matches the document that contains the specified field(including the documents where the value of that field is null).
+//   const user = await Tutors.find();
+//   const applied = await Tutors.find({ jobCode: { $exists: true, $ne: [] } });
+//   res.json(applied);
+// });
 
 //UPDATE APPLIED JOBS
 router.patch("tutor/applied", auth, async (req, res) => {});
@@ -156,3 +156,4 @@ router.patch("tutor/applied", auth, async (req, res) => {});
 // });
 
 module.exports = router;
+
