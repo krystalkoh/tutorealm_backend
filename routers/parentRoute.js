@@ -132,7 +132,7 @@ router.get("/parent/create", auth, async (req, res) => {
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY
 router.patch("/availableJobs/update", async (req, res) => {
-  const updateJobs = await Parents.updateOne({});
+  const updateJobs = await Parents.findOneAndUpdate({});
 });
 
 //READ TUTORS WHO APPLIED
@@ -143,36 +143,36 @@ router.get("/tutorApplications", async (req, res) => {
 //READ FULL TUTOR PROFILE
 
 //UPDATE PERSONAL DETAILS
-router.patch("/parent/registration", async (req, res) => {
+router.patch("/parent/registration", auth, async (req, res) => {
   try {
-    const hash = await bcrypt.hash(req.body.password, 12);
-    const updateParentProf = await Parents.updateMany(
-      { email: req.body.email },
-      {
-        $set: {
-          email: req.body.email,
-          hash,
-          parentName: req.body.parentName,
-          contact: {
-            phone: req.body.contact.phone,
-            address: req.body.contact.address,
-          },
-        },
-      }
-    );
+    // const hash = await bcrypt.hash(req.body.password, 12);
+    const parentUser = await Parents.findOne(req.decoded.email);
+    const updateParentProf = await Parents.findOneAndUpdate({
+      email: req.body.email || parentUser.email,
+      hash, //bcrypt.hash(req.body.password, 12) || parentUser.hash, ??
+      parentName: req.body.parentName || parentUser.parentName,
+      contact: {
+        phone: req.body.contact.phone || parentUser.phone,
+        address: req.body.contact.address || parentUser.address,
+      },
+    });
     console.log("created user", updateParentProf);
     res.json({ status: "ok", message: "user updated" });
+    //res.json(updateParentProf)
+    //cosnt hash = await bcrypt.hash(parentUserpassword, 12);
+    //const updateHash = await Tutors.updateOne(user.hash, hash);
   } catch (error) {
     console.log("PATCH /update", error);
-    res.status(400),
-      json({ status: "error", message: "an error has occurred" });
+    res
+      .status(400)
+      .json({ status: "error", message: "parent personal info update failed" });
   }
 });
 
 //UPDATE (NEW ASSIGNMENT)
 router.patch("/newAssignment", auth, async (req, res) => {
   const parent = await Parents.findOneandUpdate(
-    { email: req.body.email }, 
+    { email: req.body.email },
     {
       $push: {
         assignment: req.body.assignment,
