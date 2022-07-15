@@ -109,15 +109,30 @@ router.post("/parent/refresh", (req, res) => {
   }
 });
 
+<<<<<<< Updated upstream
 //CREATE JOB
 // router.put("/parent/create", auth, async (req, res) => {
 //   const jobCreated = await Parents.create(req.body);
 //   res.json({ status: "ok", message: "created" });
 // });
+=======
+//UPDATE (CREATE NEW ASSIGNMENT)
+router.patch("/parent/create", auth, async (req, res) => {
+  const parent = await Parents.findOneandUpdate(
+    { email: req.body.email },
+    {
+      $push: {
+        assignment: req.body.assignment,
+      },
+    }
+  );
+  res.json(parent);
+});
+>>>>>>> Stashed changes
 
 //READ CREATED JOBS
-router.get("/parent/create", auth, async (req, res) => {
-  const createdJobList = await Parents.find();
+router.get("/parent/created", auth, async (req, res) => {
+  const createdJobList = await Parents.find({assignment: req.body.assignment});
   if (createdJobList.length > 0) {
     res.json(createdJobList);
   } else {
@@ -128,12 +143,16 @@ router.get("/parent/create", auth, async (req, res) => {
 //TUTORS WHO CLICKED APPLY
 router.patch("/tutor/apply", (req,res) => {
   //jobID from Parents collection will be pushed into Tutors collection appliedJobID array
-
 })
 
 // READ ALL TUTORS WHO APPLIED
+<<<<<<< Updated upstream
 router.get("/parent/tutorsApplied", async (req, res) => {
   const tutorList = await Tutors.find()
+=======
+router.post("/parent/tutorsApplied/:id", auth, (req, res) => {
+  const tutorList = await Tutors.find({ appliedJobId: {$contains: req.params.id}})
+>>>>>>> Stashed changes
 });
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY / true false, approving/rejecting application
@@ -150,11 +169,14 @@ router.patch("/availableJobs/update", async (req, res) => {
 // })
 //DELETING JOB ASSIGNMENT
 
+<<<<<<< Updated upstream
 //READ TUTORS WHO APPLIED
 router.get("/tutorApplications", async (req, res) => {
   const tutorApps = await Tutors.find();
 });
 
+=======
+>>>>>>> Stashed changes
 //READ FULL TUTOR PROFILE
 
 //UPDATE PERSONAL DETAILS
@@ -184,16 +206,5 @@ router.patch("/parent/registration", auth, async (req, res) => {
   }
 });
 
-//UPDATE (NEW ASSIGNMENT)
-router.patch("/newAssignment", auth, async (req, res) => {
-  const parent = await Parents.findOneandUpdate(
-    { email: req.body.email },
-    {
-      $push: {
-        assignment: req.body.assignment,
-      },
-    }
-  );
-  res.json(parent);
-});
+
 module.exports = router;
