@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 
 const Parents = require("../models/ParentsSchema");
+const Tutors = require("../models/TutorsSchema");
 
 const auth = require("../middleware/auth");
 
@@ -115,10 +116,43 @@ router.post("/parent/refresh", (req, res) => {
 //READ ALL TUTORS WHO APPLIED
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY
+router.patch("/availableJobs/update", async (req, res) => {
+  const updateJobs = await Parents.updateOne({});
+});
+
+//READ TUTORS WHO APPLIED
+router.get("/tutorApplications", async (req, res) => {
+  const tutorApps = await Tutors.find();
+});
 
 //READ FULL TUTOR PROFILE
 
 //UPDATE PERSONAL DETAILS
+router.patch("/parent/registration", async (req, res) => {
+  try {
+    const hash = await bcrypt.hash(req.body.password, 12);
+    const updateParentProf = await Parents.updateMany(
+      { email: req.body.email },
+      {
+        $set: {
+          email: req.body.email,
+          hash,
+          parentName: req.body.parentName,
+          contact: {
+            phone: req.body.contact.phone,
+            address: req.body.contact.address,
+          },
+        },
+      }
+    );
+    console.log("created user", updateParentProf);
+    res.json({ status: "ok", message: "user updated" });
+  } catch (error) {
+    console.log("PATCH /update", error);
+    res.status(400),
+      json({ status: "error", message: "an error has occurred" });
+  }
+});
 
 //UPDATE (NEW ASSIGNMENT)
 router.patch("/newChild", async (req, res) => {
