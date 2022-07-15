@@ -110,7 +110,7 @@ router.post("/parent/refresh", (req, res) => {
 });
 
 //CREATE JOB
-router.put("/create", auth, async (req, res) => {
+router.put("/parent/create", auth, async (req, res) => {
   const jobCreated = await Parents.create(req.body);
   res.json({ status: "ok", message: "created" });
 });

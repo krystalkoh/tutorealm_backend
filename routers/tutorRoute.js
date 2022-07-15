@@ -126,11 +126,10 @@ router.get("/jobs", auth, async (req, res) => {
 
 //UPDATE PROFILE
 router.patch("/tutor/registration", auth, async (req, res) => {
-  try {
-  const user = await Tutors.findOne({ email: "1234@gmail.com"});
+
   console.log("email doesnt work"); //can find by payload ID?
 
-  const updateProfile = await Tutors.findOneAndUpdate(req.body.email, {
+  const updateProfile = await Tutors.findOneAndUpdate(req.decoded.email, {
     email: req.body.email || user.email,
     hash: bcrypt.hash(req.body.password, 12) || user.hash,
     gender: req.body.gender || user.gender,
