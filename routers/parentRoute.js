@@ -130,10 +130,15 @@ router.get("/application", async (req, res) => {
   const tutorList = await Parents.find//(key)
 });
 
-//UPDATE JOB ASSIGNMENT AVAILABLITY
+//UPDATE JOB ASSIGNMENT AVAILABLITY / true false, approving/rejecting application
 router.patch("/availableJobs/update", async (req, res) => {
-  const updateJobs = await Parents.findOneAndUpdate({});
+  const updateJobs = await Parents.findOneAndUpdate({jobID: req.body.jobID}, {availability: false});
+  res.json(updateJobs);
 });
+
+//EDITING JOB ASSIGNMENT PROPER
+
+//DELETING JOB ASSIGNMENT
 
 //READ TUTORS WHO APPLIED
 router.get("/tutorApplications", async (req, res) => {
