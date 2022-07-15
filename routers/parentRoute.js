@@ -80,6 +80,7 @@ router.post("/parent/login", async (req, res) => {
   }
 });
 
+//PARENT REFRESH TOKEN
 router.post("/parent/refresh", (req, res) => {
   try {
     const decoded = jwt.verify(req.body.refresh, process.env.REFRESH_SECRET);
@@ -92,7 +93,6 @@ router.post("/parent/refresh", (req, res) => {
     };
 
     const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
-      //create access token
       expiresIn: "20m",
       jwtid: uuidv4(),
     });
@@ -109,10 +109,25 @@ router.post("/parent/refresh", (req, res) => {
 });
 
 //CREATE JOB
+router.put("/create", auth, async (req, res) => {
+  const jobCreated = await Parents.create(req.body);
+  res.json({ status: "ok", message: "created" });
+});
 
 //READ CREATED JOBS
+router.get("/create", auth, async (req, res) => {
+  const createdJobList = await Parents.find();
+  if (createdJobList.length > 0) {
+    res.json(createdJobList);
+  } else {
+    res.json({ status: "warning", message: "no data found" });
+  }
+});
 
 //READ ALL TUTORS WHO APPLIED
+router.get("/application", (req, res) => {
+  const tutorList = await Parents.find()
+});
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY
 
@@ -121,14 +136,12 @@ router.post("/parent/refresh", (req, res) => {
 //UPDATE PERSONAL DETAILS
 
 //UPDATE (NEW ASSIGNMENT)
-router.patch("/newChild", async (req, res) => {
+router.patch("/newAssignment", async (req, res) => {
   const parent = await Parents.findOneandUpdate(
     // { email: req.body.email }, search by jwt
     {
       $push: {
-        children: {
-          childName: req.body.children.childName,
-        },
+        assignment: req.body.assignment,
       },
     }
   );
