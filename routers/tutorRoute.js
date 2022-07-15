@@ -124,38 +124,7 @@ router.get("/jobs", auth, async (req, res) => {
   }
 });
 
-//UPDATE PROFILE
-router.patch("/tutor/registration", auth, async (req, res) => {
-  try {
-    console.log(req.decoded);
-    const user = await Tutors.findOne({ email: req.decoded.email }); //because this is mongoose
 
-    //findoneandupdate returns me the profile of the previous profile, to return new one, {new:true}
-    const updateProfile = await Tutors.findOneAndUpdate(
-      { email: req.decoded.email },
-      {
-        $set: {
-          email: req.body.email || user.email,
-          gender: req.body.gender || user.gender,
-          name: req.body.name || user.name,
-          edulevel: req.body.edulevel || user.edulevel,
-          contact: {
-            phone: req.body.contact.phone || user.contact.phone,
-            address: req.body.contact.address || user.contact.address,
-          },
-        },
-      },
-      { new: true }
-    );
-    res.json(updateProfile);
-  } catch (error) {
-    console.log("POST/ refresh", error);
-    res.status(401).json({
-      status: "error",
-      message: "update profile not successful",
-    });
-  }
-});
 
 //UPDATE PASSWORD -- IF GOT TIME THEN DO
 // hash: bcrypt.hash(req.body.password, 12) || user.hash, //double check better to separate the password from updating the profile
