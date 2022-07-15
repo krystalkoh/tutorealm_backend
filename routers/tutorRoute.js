@@ -126,6 +126,7 @@ router.get("/jobs", auth, async (req, res) => {
 
 //UPDATE PROFILE
 router.patch("/tutor/registration", auth, async (req, res) => {
+  try {
   const user = await Tutors.findOne({ email: "1234@gmail.com"});
   console.log("email doesnt work"); //can find by payload ID?
 
@@ -144,6 +145,10 @@ router.patch("/tutor/registration", auth, async (req, res) => {
   //needto double check this
   // const hash = await bcrypt.hash(updateProfile.password, 12);
   // const updateHash = await Tutors.updateOne(user.hash, hash || user.hash);
+} catch (error) {
+  console.log("PATCH /update", error);
+  res.status(400).json({status: "error", message: "tutor personal info update failed"})
+}; 
 });
 
 // READ APPLIED JOBS
