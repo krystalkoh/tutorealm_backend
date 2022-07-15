@@ -125,10 +125,10 @@ router.get("/create", auth, async (req, res) => {
   }
 });
 
-//READ ALL TUTORS WHO APPLIED
-router.get("/application", (req, res) => {
-  const tutorList = await Parents.find()
-});
+// //READ ALL TUTORS WHO APPLIED
+// router.get("/application", (req, res) => {
+//   const tutorList = await Parents.find()
+// });
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY
 router.patch("/availableJobs/update", async (req, res) => {
@@ -172,7 +172,7 @@ router.patch("/parent/registration", async (req, res) => {
 //UPDATE (NEW ASSIGNMENT)
 router.patch("/newAssignment", async (req, res) => {
   const parent = await Parents.findOneandUpdate(
-    // { email: req.body.email }, search by jwt
+    { email: req.body.email }, 
     {
       $push: {
         assignment: req.body.assignment,

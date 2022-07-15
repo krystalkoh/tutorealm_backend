@@ -112,14 +112,22 @@ router.post("/tutor/refresh", (req, res) => {
 
 //READ AVAILABLE JOBS
 router.get("/jobs", auth, async (req, res) => {
-  const jobs = await Parents.find({ availability: true });
+  try {
+    const jobs = await Parents.find({ availability: true });
   res.json(jobs);
+  } catch (error) {
+    res.status(401).json({
+      status: "error",
+      message: "can't find jobs",
+    });
+  }
+  
 });
 
 //UPDATE PROFILE
 router.patch("/tutor/registration", auth, async (req, res) => {
-  const user = await Tutors.findOne(decoded.email);
-  console.log(req.email); //can find by payload ID?
+  const user = await Tutors.findOne({ email: "1234@gmail.com"});
+  console.log("email doesnt work"); //can find by payload ID?
 
   const updateProfile = await Tutors.findOneAndUpdate(req.body.email, {
     email: req.body.email || user.email,

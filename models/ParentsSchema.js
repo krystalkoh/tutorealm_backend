@@ -51,10 +51,10 @@ const ParentsSchema = new mongoose.Schema(
           { duration: String, frequency: String, days: String, default: "" },
         ],
         rate: { type: String, default: "" },
+        availability: { type: Boolean, default: true },
       },
     ],
     role: { type: String, default: "Parent" },
-    availability: { type: Boolean, default: true },
   },
   { collection: "parents" }
 );
