@@ -110,10 +110,10 @@ router.post("/parent/refresh", (req, res) => {
 });
 
 //CREATE JOB
-router.put("/parent/create", auth, async (req, res) => {
-  const jobCreated = await Parents.create(req.body);
-  res.json({ status: "ok", message: "created" });
-});
+// router.put("/parent/create", auth, async (req, res) => {
+//   const jobCreated = await Parents.create(req.body);
+//   res.json({ status: "ok", message: "created" });
+// });
 
 //READ CREATED JOBS
 router.get("/parent/create", auth, async (req, res) => {
@@ -132,7 +132,7 @@ router.patch("/tutor/apply", (req,res) => {
 })
 
 // READ ALL TUTORS WHO APPLIED
-router.get("/parent/tutorsApplied", (req, res) => {
+router.get("/parent/tutorsApplied", async (req, res) => {
   const tutorList = await Tutors.find()
 });
 
@@ -142,9 +142,12 @@ router.patch("/availableJobs/update", async (req, res) => {
   res.json(updateJobs);
 });
 
-<<<<<<< Updated upstream
 //EDITING JOB ASSIGNMENT PROPER
-
+// router.patch("/availableJobs/edit", async (req, res) => {
+//   const editJobs = await Parents.findOneAndUpdate({jobID: req.body.jobID}, {$set: {assignment: {
+//     childName: 
+//   }}})
+// })
 //DELETING JOB ASSIGNMENT
 
 //READ TUTORS WHO APPLIED
@@ -152,8 +155,6 @@ router.get("/tutorApplications", async (req, res) => {
   const tutorApps = await Tutors.find();
 });
 
-=======
->>>>>>> Stashed changes
 //READ FULL TUTOR PROFILE
 
 //UPDATE PERSONAL DETAILS
