@@ -9,8 +9,8 @@ const TutorsSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["male", "female", "non-binary"]
-  },
+      enum: ["male", "female", "non-binary"],
+    },
     hash: {
       type: String,
       required: true,
@@ -27,7 +27,8 @@ const TutorsSchema = new mongoose.Schema(
       phone: { type: String, required: true },
       address: { type: String, required: true },
     },
-    role: { type: String, default: "Tutor" }
+    role: { type: String, default: "Tutor" },
+    appliedJobId: [{ String }],
   },
   { collection: "tutors" }
 );

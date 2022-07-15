@@ -125,10 +125,16 @@ router.get("/parent/create", auth, async (req, res) => {
   }
 });
 
-// //READ ALL TUTORS WHO APPLIED
-// router.get("/parent/tutorsApplied", (req, res) => {
-//   const tutorList = await Tutors.find()
-// });
+//TUTORS WHO CLICKED APPLY
+router.patch("/tutor/apply", (req,res) => {
+  //jobID from Parents collection will be pushed into Tutors collection appliedJobID array
+
+})
+
+// READ ALL TUTORS WHO APPLIED
+router.get("/parent/tutorsApplied", (req, res) => {
+  const tutorList = await Tutors.find()
+});
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY / true false, approving/rejecting application
 router.patch("/availableJobs/update", async (req, res) => {
@@ -136,6 +142,7 @@ router.patch("/availableJobs/update", async (req, res) => {
   res.json(updateJobs);
 });
 
+<<<<<<< Updated upstream
 //EDITING JOB ASSIGNMENT PROPER
 
 //DELETING JOB ASSIGNMENT
@@ -145,6 +152,8 @@ router.get("/tutorApplications", async (req, res) => {
   const tutorApps = await Tutors.find();
 });
 
+=======
+>>>>>>> Stashed changes
 //READ FULL TUTOR PROFILE
 
 //UPDATE PERSONAL DETAILS

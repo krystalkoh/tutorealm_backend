@@ -21,6 +21,7 @@ const ParentsSchema = new mongoose.Schema(
     },
     assignments: [
       {
+        jobID: { type: Number, default: Date.now() },
         childName: {
           type: String,
           required: true,
