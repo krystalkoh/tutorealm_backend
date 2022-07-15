@@ -116,7 +116,7 @@ router.put("/parent/create", auth, async (req, res) => {
 });
 
 //READ CREATED JOBS
-router.get("/create", auth, async (req, res) => {
+router.get("/parent/create", auth, async (req, res) => {
   const createdJobList = await Parents.find();
   if (createdJobList.length > 0) {
     res.json(createdJobList);
@@ -125,10 +125,10 @@ router.get("/create", auth, async (req, res) => {
   }
 });
 
-//READ ALL TUTORS WHO APPLIED
-router.get("/application", async (req, res) => {
-  const tutorList = await Parents.find//(key)
-});
+// //READ ALL TUTORS WHO APPLIED
+// router.get("/parent/tutorsApplied", (req, res) => {
+//   const tutorList = await Tutors.find()
+// });
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY / true false, approving/rejecting application
 router.patch("/availableJobs/update", async (req, res) => {
@@ -175,7 +175,7 @@ router.patch("/parent/registration", auth, async (req, res) => {
 });
 
 //UPDATE (NEW ASSIGNMENT)
-router.patch("/newAssignment", async (req, res) => {
+router.patch("/newAssignment", auth, async (req, res) => {
   const parent = await Parents.findOneandUpdate(
     { email: req.body.email },
     {
