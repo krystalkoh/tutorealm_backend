@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const router = express.Router();
 const Tutors = require("../models/TutorsSchema");
+const Parents = require("../models/ParentsSchema");
 
 const auth = require("../middleware/auth");
 
@@ -59,7 +60,7 @@ router.post("/tutor/login", async (req, res) => {
     const payload = {
       id: tutor._id,
       email: tutor.email,
-      role: tutor.role
+      role: tutor.role,
     };
 
     const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
@@ -76,7 +77,7 @@ router.post("/tutor/login", async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.log("POST /login", error); 
+    console.log("POST /login", error);
     res.status(400).json({ status: "error", message: "login failed" });
   }
 });
@@ -90,7 +91,7 @@ router.post("/tutor/refresh", (req, res) => {
     const payload = {
       id: decoded._id,
       email: decoded.email,
-      role: decoded.role
+      role: decoded.role,
     };
 
     const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
@@ -110,17 +111,48 @@ router.post("/tutor/refresh", (req, res) => {
 });
 
 //READ AVAILABLE JOBS
+router.get("/jobs", auth, async (req, res) => {
+  const jobs = await Parents.find({ availability: true });
+  res.json(jobs);
+});
 
 //UPDATE PROFILE
+router.patch("/tutor/registration", auth, async (req, res) => {
+  const user = await Tutors.findOne(decoded.email);
+  console.log(req.email); //can find by payload ID?
 
-//READ APPLIED JOBS
+  const updateProfile = await Tutors.findOneAndUpdate(req.body.email, {
+    email: req.body.email || user.email,
+    password: req.body.password || user.password,
+    gender: req.body.gender || user.gender,
+    name: req.body.name || user.name,
+    edulevel: req.body.edulevel || user.edulevel,
+    contact: {
+      phone: req.body.contact.phone || user.phone,
+      address: req.body.contact.address || user.address,
+    },
+  });
+  res.json(updateProfile);
+  //needto double check this
+  const hash = await bcrypt.hash(updateProfile.password, 12);
+  const updateHash = await Tutors.updateOne(user.hash, hash || user.hash);
+});
+
+// READ APPLIED JOBS
+router.get("/tutor/applied", auth, async (req, res) => {
+  //When the value of $exists operator is set to true, then this operator matches the document that contains the specified field(including the documents where the value of that field is null).
+  const user = await Tutors.find();
+  const applied = await Tutors.find({ jobCode: { $exists: true, $ne: [] } });
+  res.json(applied);
+});
 
 //UPDATE APPLIED JOBS
+router.patch("tutor/applied", auth, async (req, res) => {});
 
 // READ (protected)
-router.get("/users", auth, async (req, res) => {
-  const users = await User.find().select("username");
-  res.json(users);
-});
+// router.get("/users", auth, async (req, res) => {
+//   const users = await User.find().select("username");
+//   res.json(users);
+// });
 
 module.exports = router;
