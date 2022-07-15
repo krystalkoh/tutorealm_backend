@@ -10,7 +10,7 @@ const Tutors = require("../models/TutorsSchema");
 
 const auth = require("../middleware/auth");
 
-//Tutors-RESISTRATION
+//Tutors-REGISTRATION
 router.put("/tutor/registration", async (req, res) => {
   try {
     const user = await Tutors.findOne({ email: req.body.email });
@@ -19,11 +19,11 @@ router.put("/tutor/registration", async (req, res) => {
         .status(400)
         .json({ status: "error", message: "duplicate email/username" });
     }
-    const hash = await bcrypt.hash(req.body.password, 12); //12 times salt
+    const hash = await bcrypt.hash(req.body.password, 12);
     const createdTutor = await Tutors.create({
       email: req.body.email,
       hash,
-      //gender: for later
+      gender: req.body.gender,
       name: req.body.name,
       edulevel: req.body.edulevel,
       contact: {
@@ -76,12 +76,12 @@ router.post("/tutor/login", async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.log("POST /login", error); //for server
-    res.status(400).json({ status: "error", message: "login failed" }); //for client
+    console.log("POST /login", error); 
+    res.status(400).json({ status: "error", message: "login failed" });
   }
 });
 
-//Tutor refresh
+//TUTOR REFRESH TOKEN
 router.post("/tutor/refresh", (req, res) => {
   try {
     const decoded = jwt.verify(req.body.refresh, process.env.REFRESH_SECRET);
@@ -94,7 +94,6 @@ router.post("/tutor/refresh", (req, res) => {
     };
 
     const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
-      //create access token
       expiresIn: "20m",
       jwtid: uuidv4(),
     });
@@ -109,6 +108,14 @@ router.post("/tutor/refresh", (req, res) => {
     });
   }
 });
+
+//READ AVAILABLE JOBS
+
+//UPDATE PROFILE
+
+//READ APPLIED JOBS
+
+//UPDATE APPLIED JOBS
 
 // READ (protected)
 router.get("/users", auth, async (req, res) => {

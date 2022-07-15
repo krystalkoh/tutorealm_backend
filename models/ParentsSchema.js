@@ -19,7 +19,7 @@ const ParentsSchema = new mongoose.Schema(
       phone: { type: String, required: true },
       address: { type: String, required: true },
     },
-    children: [
+    assignments: [
       {
         childName: {
           type: String,
@@ -47,11 +47,14 @@ const ParentsSchema = new mongoose.Schema(
           default: "",
         },
         subject: [{ type: String, default: "" }],
-        time: [{  duration: String, frequency: String, days: String, default: "" }],
+        time: [
+          { duration: String, frequency: String, days: String, default: "" },
+        ],
         rate: { type: String, default: "" },
       },
     ],
-    role: { type: String, default: "Parent" }
+    role: { type: String, default: "Parent" },
+    availability: { type: Boolean, default: true },
   },
   { collection: "parents" }
 );

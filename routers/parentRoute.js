@@ -108,13 +108,19 @@ router.post("/parent/refresh", (req, res) => {
   }
 });
 
-// READ (protected)
-router.get("/users", auth, async (req, res) => {
-  const users = await User.find().select("username");
-  res.json(users);
-});
+//CREATE JOB
 
-//PARENT UPDATE (new child)
+//READ CREATED JOBS
+
+//READ ALL TUTORS WHO APPLIED
+
+//UPDATE JOB ASSIGNMENT AVAILABLITY
+
+//READ FULL TUTOR PROFILE
+
+//UPDATE PERSONAL DETAILS
+
+//UPDATE (NEW ASSIGNMENT)
 router.patch("/newChild", async (req, res) => {
   const parent = await Parents.findOneandUpdate(
     // { email: req.body.email }, search by jwt
