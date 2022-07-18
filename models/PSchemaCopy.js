@@ -15,21 +15,20 @@
 //       type: String,
 //       required: true,
 //     },
-//     contact: {
-//       phone: { type: String, required: true },
-//       address: { type: String, required: true },
-//     },
+//     phone: { type: String, required: true },
+//     address: { type: String, required: true },
 //     assignments: [
 //       {
-//         jobID: { type: Number, default: Date.now() },
+//         jobID: {type: Number, default: Date.now()},
 //         childName: {
 //           type: String,
 //           required: true,
-//           default: "",
+//           default: "name of child",
 //         },
 //         level: {
 //           type: String,
 //           enum: [
+//             "select",
 //             "P1",
 //             "P2",
 //             "P3",
@@ -45,12 +44,10 @@
 //             "JC2",
 //           ],
 //           required: true,
-//           default: "",
+//           default: "select",
 //         },
 //         subject: [{ type: String, default: "" }],
-//         time: [
-//           { duration: String, frequency: String, days: String, default: "" },
-//         ],
+//         time: [{ duration: String, frequency: String, days: String, default: "" }],
 //         rate: { type: String, default: "" },
 //         availability: { type: Boolean, default: true },
 //       },

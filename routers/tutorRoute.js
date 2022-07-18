@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const Tutors = require("../models/TutorsSchema");
 const Parents = require("../models/ParentsSchema");
+const Assignments = require("../models/AssignmentsSchema");
 
 const auth = require("../middleware/auth");
 const { hash } = require("bcrypt");
@@ -28,10 +29,9 @@ router.put("/tutor/registration", async (req, res) => {
       gender: req.body.gender,
       name: req.body.name,
       edulevel: req.body.edulevel,
-      contact: {
-        phone: req.body.contact.phone,
-        address: req.body.contact.address,
-      },
+      phone: req.body.phone,
+      address: req.body.address,
+      appliedJobId: 9
     });
     console.log("created user", createdTutor);
     res.json({ status: "ok", message: "user created" });
