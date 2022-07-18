@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const Parents = require("../models/ParentsSchema");
 const Tutors = require("../models/TutorsSchema");
+const Assignments = require("../models/AssignmentsSchema");
 
 const auth = require("../middleware/auth");
 const { hash } = require("bcrypt");
@@ -26,21 +27,9 @@ router.put("/parent/registration", async (req, res) => {
       email: req.body.email,
       hash,
       parentName: req.body.parentName,
-      contact: {
-        phone: req.body.contact.phone,
-        address: req.body.contact.address,
-      },
-      assignments: [
-        {
-          jobID: 8,
-          childName: undefined,
-          level: undefined,
-          subject: undefined,
-          time: undefined,
-          rate: undefined,
-          availability: undefined,
-        },
-      ],
+      phone: req.body.phone,
+      address: req.body.address,
+      role: undefined
     });
     console.log("created user", createdParent);
     res.json({ status: "ok", message: "user created" });
@@ -120,26 +109,62 @@ router.post("/parent/refresh", (req, res) => {
 });
 
 //UPDATE (CREATE NEW ASSIGNMENT)
-router.patch("/parent/create", auth, async (req, res) => {
-  console.log(req.body.assignments.childName);
-  const createJob = await Parents.findOneAndUpdate(
-    { email: req.decoded.email },
-    {
-      $set: {
-        assignments: [{
-          jobID: undefined,
-          childName: req.body.assignments.childName,
-          level: req.body.assignments.level,
-          subject: req.body.assignments.subject,
-          time: req.body.assignments.time,
-          rate: req.body.assignments.rate,
-          availability: undefined
-        }]
-      },
+//OLD
+// router.patch("/parent/create", auth, async (req, res) => {
+//   console.log(req.body.assignments.childName);
+//   const createJob = await Parents.findOneAndUpdate(
+//     { email: req.decoded.email },
+//     {
+//       $set: {
+//         assignments: [{
+//           jobID: undefined,
+//           childName: req.body.assignments.childName,
+//           level: req.body.assignments.level,
+//           subject: req.body.assignments.subject,
+//           time: req.body.assignments.time,
+//           rate: req.body.assignments.rate,
+//           availability: undefined
+//         }]
+//       },
+//     }
+//   );
+//   console.log(req.body.assignments);
+//   res.json(createJob);
+// });
+
+//CREATE NEW ASSIGNMENT NEW SCHEMA TEST
+router.put("/parent/create", auth, async (req, res) => {
+  try {
+    const existingJob = await Assignments.findOne({
+      creationJobID: req.body.creationJobID,
+    });
+    if (existingJob) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Job Already Exists" });
     }
-  );
-  console.log(req.body.assignments);
-  res.json(createJob);
+    const parentId = await Parents.findOne(req.decoded.email);
+    if (!parentId) {
+      return res.status(400).json({ status: "error", message: "unathuroized"});
+    }
+    const createJob = await Assignments.create({
+      creationJobID: undefined,
+      appliedJobID: 0,
+      childName: req.body.childName,
+      level: req.body.level,
+      subject: req.body.subject,
+      duration: req.body.duration,
+      frequency: req.body.frequency,
+      days: req.body.days,
+      rate: req.body.rate,
+      availability: undefined,
+    });
+    console.log("created Job", createJob);
+    res.json(createJob);
+  } catch (error) {
+    console.log("PUT /create", error);
+    res.status(400).json({ status: "error", message: "failed to create job" });
+  }
 });
 
 //READ CREATED JOBS
@@ -188,7 +213,7 @@ router.patch("/availableJobs/edit", auth, async (req, res) => {
           assignments: {
             childName:
               req.body.assignments.childName || user.assignments.childName,
-              level: req.body.assignments.level || user.assignments.level,
+            level: req.body.assignments.level || user.assignments.level,
             // subject:
           },
         },
