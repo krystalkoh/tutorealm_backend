@@ -2,8 +2,10 @@ const mongoose = require("mongoose");
 
 const AssignmentsSchema = new mongoose.Schema(
     {
-        creationJobID: { type: Number, default: Date.now() },
-        appliedJobID: { type: Number, default: Date.now()},
+        // jobKey: {type: Number, default: Date.now()},
+        // parentSourceName: {type: mongoose.Schema.Types.ObjectId, ref: "Parents"},
+        parentJobID: {type: Number, default: Date.now()}, 
+        // appliedJobID: { type: Number, default: Date.now()},
         childName: {
           type: String,
           required: true,
@@ -39,6 +41,6 @@ const AssignmentsSchema = new mongoose.Schema(
   { collection: "assignments" }
 );
 
-const Assignments = mongoose.model("assignements", AssignmentsSchema);
+const Assignments = mongoose.model("Assignments", AssignmentsSchema);
 
 module.exports = Assignments;

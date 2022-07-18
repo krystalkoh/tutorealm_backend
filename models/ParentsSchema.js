@@ -22,6 +22,6 @@ const ParentsSchema = new mongoose.Schema(
   { collection: "parents" }
 );
 
-const Parents = mongoose.model("parents", ParentsSchema);
+const Parents = mongoose.model("Parent", ParentsSchema);
 
 module.exports = Parents;

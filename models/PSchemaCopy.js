@@ -18,7 +18,8 @@
 //     phone: { type: String, required: true },
 //     address: { type: String, required: true },
 //     assignments: [
-//       {
+//       { 
+//         tutorID: {},
 //         jobID: {type: Number, default: Date.now()},
 //         childName: {
 //           type: String,
@@ -47,7 +48,7 @@
 //           default: "select",
 //         },
 //         subject: [{ type: String, default: "" }],
-//         time: [{ duration: String, frequency: String, days: String, default: "" }],
+//         time: {{ duration: {type: String, default: ""}, frequency: String, days: String, default: "" }},
 //         rate: { type: String, default: "" },
 //         availability: { type: Boolean, default: true },
 //       },
