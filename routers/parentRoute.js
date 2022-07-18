@@ -6,11 +6,11 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 
 const router = express.Router();
-
 const Parents = require("../models/ParentsSchema");
 const Tutors = require("../models/TutorsSchema");
 
 const auth = require("../middleware/auth");
+const { hash } = require("bcrypt");
 
 //Parents-REGISTRATION
 router.put("/parent/registration", async (req, res) => {
@@ -21,7 +21,7 @@ router.put("/parent/registration", async (req, res) => {
         .status(400)
         .json({ status: "error", message: "duplicate email/username" });
     }
-    const hash = await bcrypt.hash(req.body.password, 12); //12 times salt
+    const hash = await bcrypt.hash(req.body.password, 12);
     const createdParent = await Parents.create({
       email: req.body.email,
       hash,
@@ -30,17 +30,27 @@ router.put("/parent/registration", async (req, res) => {
         phone: req.body.contact.phone,
         address: req.body.contact.address,
       },
+      assignments: [
+        {
+          jobID: 8,
+          childName: undefined,
+          level: undefined,
+          subject: undefined,
+          time: undefined,
+          rate: undefined,
+          availability: undefined,
+        },
+      ],
     });
     console.log("created user", createdParent);
     res.json({ status: "ok", message: "user created" });
   } catch (error) {
     console.log("PUT /create", error);
-    res.status(400),
-      json({ status: "error", message: "an error has occurred" });
+    res.status(400).json({ status: "error", message: "an error has occurred" });
   }
 });
 
-//PARENT LOGIN
+//Parent-LOGIN
 router.post("/parent/login", async (req, res) => {
   try {
     const parent = await Parents.findOne({ email: req.body.email });
@@ -111,20 +121,32 @@ router.post("/parent/refresh", (req, res) => {
 
 //UPDATE (CREATE NEW ASSIGNMENT)
 router.patch("/parent/create", auth, async (req, res) => {
-  const parent = await Parents.findOneandUpdate(
-    { email: req.body.email },
+  console.log(req.body.assignments.childName);
+  const createJob = await Parents.findOneAndUpdate(
+    { email: req.decoded.email },
     {
-      $push: {
-        assignment: req.body.assignment,
+      $set: {
+        assignments: [{
+          jobID: undefined,
+          childName: req.body.assignments.childName,
+          level: req.body.assignments.level,
+          subject: req.body.assignments.subject,
+          time: req.body.assignments.time,
+          rate: req.body.assignments.rate,
+          availability: undefined
+        }]
       },
     }
   );
-  res.json(parent);
+  console.log(req.body.assignments);
+  res.json(createJob);
 });
 
 //READ CREATED JOBS
 router.get("/parent/created", auth, async (req, res) => {
-  const createdJobList = await Parents.find({assignment: req.body.assignment});
+  const createdJobList = await Parents.find({
+    assignments: req.body.assignments,
+  });
   if (createdJobList.length > 0) {
     res.json(createdJobList);
   } else {
@@ -133,62 +155,98 @@ router.get("/parent/created", auth, async (req, res) => {
 });
 
 //TUTORS WHO CLICKED APPLY
-router.patch("/tutor/apply", (req,res) => {
-  //jobID from Parents collection will be pushed into Tutors collection appliedJobID array
-})
+router.patch("/parent/tutorApplied", (req, res) => {
+  //jobID from Parents collection will be pushed/populate into Tutors collection appliedJobID array.
+  //baring that. how about creating a new collection specifically for jobs, that can be accessed by both tutors and parents...think...
+});
 
 // READ ALL TUTORS WHO APPLIED
-router.post("/parent/tutorsApplied/:id", auth, (req, res) => {
-  const tutorList = await Tutors.find({ appliedJobId: {$contains: req.params.id}})
+router.post("/parent/tutorsApplied/:id", auth, async (req, res) => {
+  const tutorList = await Tutors.find({
+    appliedJobId: { $contains: req.params.id },
+  });
+  res.json(tutorList);
 });
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY / true false, approving/rejecting application
-router.patch("/availableJobs/update", async (req, res) => {
-  const updateJobs = await Parents.findOneAndUpdate({jobID: req.body.jobID}, {availability: false});
+router.patch("/availableJobs/approval", async (req, res) => {
+  const updateJobs = await Parents.findOneAndUpdate(
+    { jobID: req.body.jobID },
+    { availability: false }
+  );
   res.json(updateJobs);
 });
 
 //EDITING JOB ASSIGNMENT PROPER
-// router.patch("/availableJobs/edit", async (req, res) => {
-//   const editJobs = await Parents.findOneAndUpdate({jobID: req.body.jobID}, {$set: {assignment: {
-//     childName: 
-//   }}})
-// })
-//DELETING JOB ASSIGNMENT
-
-//READ TUTORS WHO APPLIED
-router.get("/tutorApplications", async (req, res) => {
-  const tutorApps = await Tutors.find();
+router.patch("/availableJobs/edit", auth, async (req, res) => {
+  try {
+    const user = await Parents.findOne({ email: req.decoded.email });
+    const editJobs = await Parents.findOneAndUpdate(
+      { jobID: req.body.jobID },
+      {
+        $set: {
+          assignments: {
+            childName:
+              req.body.assignments.childName || user.assignments.childName,
+              level: req.body.assignments.level || user.assignments.level,
+            // subject:
+          },
+        },
+      },
+      { new: true }
+    );
+    console.log("edit jobs", editJobs);
+    res.json({ status: "ok", message: "edit successful" });
+    res.json(editJobs);
+  } catch (error) {
+    console.log("PATCH /edit", error);
+    res.status(401).json({ status: "error", message: "edit unsuccessful" });
+  }
 });
 
+//DELETING JOB ASSIGNMENT
+// router.delete("/parent/removeJob", auth, async (req, res) => {
+
+// });
+
+//READ TUTORS WHO APPLIED
+// router.get("/parent/tutorApplications", auth, async (req, res) => {
+//   const tutorApps = await Tutors.find//({tutor application key});
+// });
+
 //READ FULL TUTOR PROFILE
+//router.get("/parent/tutorProfileFull", ayth, async (req, res) => {
+
+// })
 
 //UPDATE PERSONAL DETAILS
 router.patch("/parent/registration", auth, async (req, res) => {
   try {
-    // const hash = await bcrypt.hash(req.body.password, 12);
-    const parentUser = await Parents.findOne(req.decoded.email);
-    const updateParentProf = await Parents.findOneAndUpdate({
-      email: req.body.email || parentUser.email,
-      hash, //bcrypt.hash(req.body.password, 12) || parentUser.hash, ??
-      parentName: req.body.parentName || parentUser.parentName,
-      contact: {
-        phone: req.body.contact.phone || parentUser.phone,
-        address: req.body.contact.address || parentUser.address,
+    const parentUser = await Parents.findOne({ email: req.decoded.email });
+
+    const updateParentProf = await Parents.findOneAndUpdate(
+      { email: req.decoded.email },
+      {
+        $set: {
+          email: req.body.email || parentUser.email,
+          parentName: req.body.parentName || parentUser.parentName,
+          contact: {
+            phone: req.body.contact.phone || parentUser.phone,
+            address: req.body.contact.address || parentUser.address,
+          },
+        },
       },
-    });
-    console.log("created user", updateParentProf);
+      { new: true }
+    );
+    console.log("updated user", updateParentProf);
     res.json({ status: "ok", message: "user updated" });
-    //res.json(updateParentProf)
-    //cosnt hash = await bcrypt.hash(parentUserpassword, 12);
-    //const updateHash = await Tutors.updateOne(user.hash, hash);
+    res.json(updateParentProf);
   } catch (error) {
     console.log("PATCH /update", error);
     res
-      .status(400)
+      .status(401)
       .json({ status: "error", message: "parent personal info update failed" });
   }
 });
-
 
 module.exports = router;
