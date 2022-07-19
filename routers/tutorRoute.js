@@ -109,6 +109,25 @@ router.post("/tutor/refresh", (req, res) => {
   }
 });
 
+//GET OLD PROFILE (JUST ADDED)
+router.get("/tutor/registration", auth, async (req, res) => {
+  try {
+    console.log(req.decoded);
+    const getProfile = await Tutors.findOne(
+      { email: req.decoded.email },
+      {},
+      { new: true }
+    );
+    res.json(getProfile);
+  } catch (error) {
+    console.log("POST/ refresh", error);
+    res.status(401).json({
+      status: "error",
+      message: "update profile not successful",
+    });
+  }
+});
+
 //UPDATE PROFILE
 router.patch("/tutor/registration", auth, async (req, res) => {
   try {
@@ -181,9 +200,7 @@ router.patch("/tutor/applied", auth, async (req, res) => {
       { $push: { jobsApplied: req.body.jobid } }
     );
     console.log(addApplied);
-
-    //return
-    // res.json(jobs);
+    res.json(jobs);
     // res.json(addApplied);
   } catch (error) {
     res.status(401).json({
@@ -193,18 +210,12 @@ router.patch("/tutor/applied", auth, async (req, res) => {
   }
 });
 
-//Job apply
-// router.put("/tutor/apply", auth, async (req, res) => {
-//   const jobApply = await Tutors.aggregate({
-//     $lookup: {
-//       from: "Assignments",
-//       localField: "name",
-//       foreignField: "parentName",
-//       as: "Assignment",
-//     },
-//   });
-//   res.json(jobApply);
-// });
+//READ APPLIED JOBs
+
+//DELETE APPLIED JOBS
+// router.patch("tutor/applied", auth, async (req, res) => {});
+
+///below may not need
 
 //UPDATE PASSWORD -- IF GOT TIME THEN DO
 // hash: bcrypt.hash(req.body.password, 12) || user.hash, //double check better to separate the password from updating the profile
@@ -219,9 +230,6 @@ router.patch("/tutor/applied", auth, async (req, res) => {
 //   const applied = await Tutors.find({ jobCode: { $exists: true, $ne: [] } });
 //   res.json(applied);
 // });
-
-//DELETE APPLIED JOBS
-// router.patch("tutor/applied", auth, async (req, res) => {});
 
 // READ (protected)
 // router.get("/users", auth, async (req, res) => {

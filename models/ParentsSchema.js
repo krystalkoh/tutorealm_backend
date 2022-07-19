@@ -51,7 +51,7 @@ const ParentsSchema = new mongoose.Schema(
         days: { type: String, default: "" },
         rate: { type: String, default: "" },
         availability: { type: Boolean, default: true },
-        tutorsApplied: [],
+        tutorsApplied: [{ type: String, default: "No tutors applied" }],
       },
     ],
     role: { type: String, default: "Parent" },
