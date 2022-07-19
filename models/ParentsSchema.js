@@ -17,7 +17,7 @@ const ParentsSchema = new mongoose.Schema(
     },
     phone: { type: String, required: true },
     address: { type: String, required: true },
-    assignments: [{
+    assignments: [{      
         childName: {
           type: String,
           required: true,
@@ -44,7 +44,7 @@ const ParentsSchema = new mongoose.Schema(
           required: true,
           default: "select",
         },
-        subject: [{ type: String, default: "" }],
+        subject: { type: String, default: "" },
         duration: {type: String, default: ""}, 
         frequency: {type: String, default: ""},
         days: {type: String, default: "" },
