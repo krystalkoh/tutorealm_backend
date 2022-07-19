@@ -109,10 +109,9 @@ router.post("/parent/refresh", (req, res) => {
 });
 
 //UPDATE (CREATE NEW ASSIGNMENT)
-//OLD
 router.patch("/parent/create", auth, async (req, res) => {
   // console.log(req.decoded.email);
-  console.log(req.body.childName);
+  // maybe throw in try {} catch () {}
   const createJob = await Parents.findOneAndUpdate(
     { email: req.decoded.email },
     {
@@ -133,55 +132,13 @@ router.patch("/parent/create", auth, async (req, res) => {
   res.json(createJob);
 });
 
-//Assign parent name
-router.put("/parent/assignName", auth, async (req, res) => {
-  const addName = await Assignments.find().populate("parentSourceName");
-  console.log(addName);
-  res.json(addName);
-});
-
-//CREATE NEW ASSIGNMENT NEW SCHEMA TEST
-// router.put("/parent/create", auth, async (req, res) => {
-//   try {
-//     const existingJob = await Assignments.findOne({
-//       creationJobID: req.body.creationJobID,
-//     });
-//     if (existingJob) {
-//       return res
-//         .status(400)
-//         .json({ status: "error", message: "Job Already Exists" });
-//     }
-//     const parentId = await Parents.findOne({email: req.decoded.email});
-//     if (!parentId) {
-//       return res.status(400).json({ status: "error", message: "unathuroized"});
-//     }
-
-//     const createJob = await Assignments.create({
-//       parentJobID: undefined,
-//       // appliedJobID: 0,
-//       childName: req.body.childName,
-//       level: req.body.level,
-//       subject: req.body.subject,
-//       duration: req.body.duration,
-//       frequency: req.body.frequency,
-//       days: req.body.days,
-//       rate: req.body.rate,
-//       availability: undefined,
-//     });
-//     console.log("created Job", createJob);
-//     res.json(createJob);
-
-//   } catch (error) {
-//     console.log("PUT /create", error);
-//     res.status(400).json({ status: "error", message: "failed to create job" });
-//   }
-// });
-
 //READ CREATED JOBS
 router.get("/parent/created", auth, async (req, res) => {
   const createdJobList = await Parents.find({
     assignments: req.body.assignments,
   });
+  console.log(createdJobList);
+
   if (createdJobList.length > 0) {
     res.json(createdJobList);
   } else {
