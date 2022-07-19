@@ -111,19 +111,19 @@ router.post("/parent/refresh", (req, res) => {
 //UPDATE (CREATE NEW ASSIGNMENT)
 //OLD
 router.patch("/parent/create", auth, async (req, res) => {
-  console.log(req.body.assignments.childName);
+  // console.log(req.body.assignments.childName);
   const createJob = await Parents.findOneAndUpdate(
     { email: req.decoded.email },
     {
       $set: {
         assignments: [{
-          jobID: undefined,
-          childName: req.body.assignments.childName,
-          level: req.body.assignments.level,
-          subject: req.body.assignments.subject,
-          time: req.body.assignments.time,
-          rate: req.body.assignments.rate,
-          availability: undefined
+          // jobID: undefined,
+          childName: req.body.assignments.$.childName,
+          level: req.body.assignments.$.level,
+          subject: req.body.assignments.$.subject,
+          time: req.body.assignments.$.time,
+          rate: req.body.assignments.$.rate,
+          // availability: undefined
         }]
       },
     }
