@@ -8,7 +8,6 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const Tutors = require("../models/TutorsSchema");
 const Parents = require("../models/ParentsSchema");
-const Assignments = require("../models/AssignmentsSchema");
 
 const auth = require("../middleware/auth");
 const { hash } = require("bcrypt");

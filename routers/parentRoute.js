@@ -8,7 +8,6 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const Parents = require("../models/ParentsSchema");
 const Tutors = require("../models/TutorsSchema");
-const Assignments = require("../models/AssignmentsSchema");
 
 const auth = require("../middleware/auth");
 const { hash } = require("bcrypt");
@@ -111,27 +110,27 @@ router.post("/parent/refresh", (req, res) => {
 
 //UPDATE (CREATE NEW ASSIGNMENT)
 //OLD
-// router.patch("/parent/create", auth, async (req, res) => {
-//   console.log(req.body.assignments.childName);
-//   const createJob = await Parents.findOneAndUpdate(
-//     { email: req.decoded.email },
-//     {
-//       $set: {
-//         assignments: [{
-//           jobID: undefined,
-//           childName: req.body.assignments.childName,
-//           level: req.body.assignments.level,
-//           subject: req.body.assignments.subject,
-//           time: req.body.assignments.time,
-//           rate: req.body.assignments.rate,
-//           availability: undefined
-//         }]
-//       },
-//     }
-//   );
-//   console.log(req.body.assignments);
-//   res.json(createJob);
-// });
+router.patch("/parent/create", auth, async (req, res) => {
+  console.log(req.body.assignments.childName);
+  const createJob = await Parents.findOneAndUpdate(
+    { email: req.decoded.email },
+    {
+      $set: {
+        assignments: [{
+          jobID: undefined,
+          childName: req.body.assignments.childName,
+          level: req.body.assignments.level,
+          subject: req.body.assignments.subject,
+          time: req.body.assignments.time,
+          rate: req.body.assignments.rate,
+          availability: undefined
+        }]
+      },
+    }
+  );
+  console.log(req.body.assignments);
+  res.json(createJob);
+});
 
 //Assign parent name
 router.put("/parent/assignName", auth, async (req, res)=>{
@@ -141,45 +140,41 @@ router.put("/parent/assignName", auth, async (req, res)=>{
 });
 
 //CREATE NEW ASSIGNMENT NEW SCHEMA TEST
-router.put("/parent/create", auth, async (req, res) => {
-  try {
-    const existingJob = await Assignments.findOne({
-      creationJobID: req.body.creationJobID,
-    });
-    if (existingJob) {
-      return res
-        .status(400)
-        .json({ status: "error", message: "Job Already Exists" });
-    }
-    const parentId = await Parents.findOne({email: req.decoded.email});
-    if (!parentId) {
-      return res.status(400).json({ status: "error", message: "unathuroized"});
-    }
+// router.put("/parent/create", auth, async (req, res) => {
+//   try {
+//     const existingJob = await Assignments.findOne({
+//       creationJobID: req.body.creationJobID,
+//     });
+//     if (existingJob) {
+//       return res
+//         .status(400)
+//         .json({ status: "error", message: "Job Already Exists" });
+//     }
+//     const parentId = await Parents.findOne({email: req.decoded.email});
+//     if (!parentId) {
+//       return res.status(400).json({ status: "error", message: "unathuroized"});
+//     }
 
-    //createJobID, type: number, default: Date.now(),
-    //document creation Assignments.create()
-    //assign createJobID to document .populate, return []
+//     const createJob = await Assignments.create({
+//       parentJobID: undefined,
+//       // appliedJobID: 0,
+//       childName: req.body.childName,
+//       level: req.body.level,
+//       subject: req.body.subject,
+//       duration: req.body.duration,
+//       frequency: req.body.frequency,
+//       days: req.body.days,
+//       rate: req.body.rate,
+//       availability: undefined,
+//     });
+//     console.log("created Job", createJob);
+//     res.json(createJob);
 
-    const createJob = await Assignments.create({
-      parentJobID: undefined,
-      // appliedJobID: 0,
-      childName: req.body.childName,
-      level: req.body.level,
-      subject: req.body.subject,
-      duration: req.body.duration,
-      frequency: req.body.frequency,
-      days: req.body.days,
-      rate: req.body.rate,
-      availability: undefined,
-    });
-    console.log("created Job", createJob);
-    res.json(createJob);
-
-  } catch (error) {
-    console.log("PUT /create", error);
-    res.status(400).json({ status: "error", message: "failed to create job" });
-  }
-});
+//   } catch (error) {
+//     console.log("PUT /create", error);
+//     res.status(400).json({ status: "error", message: "failed to create job" });
+//   }
+// });
 
 
 
