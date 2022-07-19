@@ -17,9 +17,7 @@ const ParentsSchema = new mongoose.Schema(
     },
     phone: { type: String, required: true },
     address: { type: String, required: true },
-    assignments: [
-      {
-        jobID: {type: Number, default: Date.now()},
+    assignments: [{
         childName: {
           type: String,
           required: true,
@@ -52,8 +50,7 @@ const ParentsSchema = new mongoose.Schema(
         days: {type: String, default: "" },
         rate: { type: String, default: "" },
         availability: { type: Boolean, default: true },
-      },
-    ],
+      }],
     role: { type: String, default: "Parent" },
   },
   { collection: "parents" }
