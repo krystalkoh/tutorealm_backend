@@ -139,16 +139,14 @@ router.patch("/tutor/registration", auth, async (req, res) => {
       { email: req.decoded.email },
       {
         $set: {
-          email: req.body.email || user.email,
           gender: req.body.gender || user.gender,
           name: req.body.name || user.name,
           edulevel: req.body.edulevel || user.edulevel,
-          contact: {
-            phone: req.body.contact.phone || user.contact.phone,
-            address: req.body.contact.address || user.contact.address,
-          },
+          phone: req.body.phone || user.contact.phone,
+          address: req.body.address || user.contact.address,
         },
       },
+
       { new: true }
     );
     res.json(updateProfile);
