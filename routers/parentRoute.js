@@ -29,7 +29,7 @@ router.put("/registration", async (req, res) => {
       phone: req.body.phone,
       address: req.body.address,
       role: undefined,
-      jobCreationID: 0,
+      // jobCreationID: 0,
     });
     console.log("created user", createdParent);
     res.json({ status: "ok", message: "user created" });
@@ -133,7 +133,7 @@ router.patch("/create", auth, async (req, res) => {
   res.json(createJob);
 });
 
-//READ CREATED JOBS
+//READ CREATED JOBS CHEAT CODE: NO FALSE ASSIGNMENTS
 router.get("/created", auth, async (req, res) => {
   console.log(`accessing get assignments endpoint`);
   try {
@@ -154,47 +154,46 @@ router.get("/created", auth, async (req, res) => {
 });
 
 //READ CREATED JOBS
-router.get("/createdagg", auth, async (req, res) => {
-  console.log(`accessing get assignments endpoint`);
-  try {
-    const createdJobList = await Parents.find({
-      assignments: { $elemMatch: { availability: { $eq: true } } },
-    });
-    console.log(createdJobList);
+// router.get("/createdagg", auth, async (req, res) => {
+//   console.log(`accessing get assignments endpoint`);
+//   try {
+//     const createdJobList = await Parents.find({
+//       assignments: { $elemMatch: { availability: { $eq: true } } },
+//     });
+//     console.log(createdJobList);
 
-    const availJobs = createdJobList.map((item) => {
-      for (const assignment of item) {
-        console.log(`${assignment}`);
-      }
-    });
+//     const availJobs = createdJobList.map((item) => {
+//       for (const assignment of item) {
+//         console.log(`${assignment}`);
+//       }
+//     });
 
-    // PLEASE GOD
-    console.log(`this is filtered ${availJobs}`);
+// PLEASE GOD
+// console.log(`this is filtered ${availJobs}`);
 
-    // if (createdJobList.length > 0) {
-    res.json(createdJobList);
-    // } else {
-    //   res.json({ status: "warning", message: "no data found" });
-    // }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "not ok", message: "error has occurred" });
-  }
-});
+// if (createdJobList.length > 0) {
+// res.json(createdJobList);
+// } else {
+//   res.json({ status: "warning", message: "no data found" });
+// }
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ status: "not ok", message: "error has occurred" });
+//   }
+// });
 
 //TUTORS WHO CLICKED APPLY
 router.patch("/tutorApplied", (req, res) => {
   //jobID from Parents collection will be pushed/populate into Tutors collection appliedJobID array.
-  //baring that. how about creating a new collection specifically for jobs, that can be accessed by both tutors and parents...think...
 });
 
-// READ ALL TUTORS WHO APPLIED
-router.post("/tutorsApplied/:id", auth, async (req, res) => {
-  const tutorList = await Tutors.find({
-    appliedJobId: { $contains: req.params.id },
-  });
-  res.json(tutorList);
-});
+// READ ALL TUTORS WHO APPLIED -- Need to access Tutors collection to retrieve jobID
+// router.post("/tutorsApplied/:id", auth, async (req, res) => {
+//   const tutorList = await Tutors.find({
+//     appliedJobId: { $contains: req.params.id },
+//   });
+//   res.json(tutorList);
+// });
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY / true false, approving/rejecting application
 router.patch("/availableJobs/approval", async (req, res) => {
@@ -234,7 +233,7 @@ router.patch("/availableJobs/edit", auth, async (req, res) => {
 
 //DELETING JOB ASSIGNMENT
 // router.delete("/parent/removeJob", auth, async (req, res) => {
-
+//   const shredderMech = await Parents.delete();
 // });
 
 //READ TUTORS WHO APPLIED
@@ -251,23 +250,25 @@ router.patch("/availableJobs/edit", auth, async (req, res) => {
 router.patch("/registration", auth, async (req, res) => {
   try {
     const parentUser = await Parents.findOne({ email: req.decoded.email });
-
+    if (!parentUser) {
+      return res
+      .status(400)
+      .json({ status: "error", message: "unauthorized" });
+    };
     const updateParentProf = await Parents.findOneAndUpdate(
       { email: req.decoded.email },
       {
         $set: {
           email: req.body.email || parentUser.email,
+          // make one for password in long term goal
           parentName: req.body.parentName || parentUser.parentName,
-          contact: {
-            phone: req.body.contact.phone || parentUser.phone,
-            address: req.body.contact.address || parentUser.address,
-          },
+          phone: req.body.phone || parentUser.phone,
+          address: req.body.address || parentUser.address,
         },
       },
       { new: true }
     );
     console.log("updated user", updateParentProf);
-    res.json({ status: "ok", message: "user updated" });
     res.json(updateParentProf);
   } catch (error) {
     console.log("PATCH /update", error);
