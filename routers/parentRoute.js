@@ -8,7 +8,6 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const Parents = require("../models/ParentsSchema");
 const Tutors = require("../models/TutorsSchema");
-const Assignments = require("../models/AssignmentsSchema");
 
 const auth = require("../middleware/auth");
 const { hash } = require("bcrypt");
@@ -29,7 +28,8 @@ router.put("/parent/registration", async (req, res) => {
       parentName: req.body.parentName,
       phone: req.body.phone,
       address: req.body.address,
-      role: undefined
+      role: undefined,
+      jobCreationID: 0,
     });
     console.log("created user", createdParent);
     res.json({ status: "ok", message: "user created" });
@@ -110,62 +110,74 @@ router.post("/parent/refresh", (req, res) => {
 
 //UPDATE (CREATE NEW ASSIGNMENT)
 //OLD
-// router.patch("/parent/create", auth, async (req, res) => {
-//   console.log(req.body.assignments.childName);
-//   const createJob = await Parents.findOneAndUpdate(
-//     { email: req.decoded.email },
-//     {
-//       $set: {
-//         assignments: [{
-//           jobID: undefined,
-//           childName: req.body.assignments.childName,
-//           level: req.body.assignments.level,
-//           subject: req.body.assignments.subject,
-//           time: req.body.assignments.time,
-//           rate: req.body.assignments.rate,
-//           availability: undefined
-//         }]
-//       },
-//     }
-//   );
-//   console.log(req.body.assignments);
-//   res.json(createJob);
-// });
+router.patch("/parent/create", auth, async (req, res) => {
+  // console.log(req.body.assignments.childName);
+  const createJob = await Parents.findOneAndUpdate(
+    { email: req.decoded.email },
+    {
+      $set: {
+        assignments: [{
+          // jobID: undefined,
+          childName: req.body.assignments.$.childName,
+          level: req.body.assignments.$.level,
+          subject: req.body.assignments.$.subject,
+          time: req.body.assignments.$.time,
+          rate: req.body.assignments.$.rate,
+          // availability: undefined
+        }]
+      },
+    }
+  );
+  console.log(req.body.assignments);
+  res.json(createJob);
+});
+
+//Assign parent name
+router.put("/parent/assignName", auth, async (req, res)=>{
+  const addName = await Assignments.find().populate("parentSourceName")
+  console.log(addName);
+  res.json(addName);
+});
 
 //CREATE NEW ASSIGNMENT NEW SCHEMA TEST
-router.put("/parent/create", auth, async (req, res) => {
-  try {
-    const existingJob = await Assignments.findOne({
-      creationJobID: req.body.creationJobID,
-    });
-    if (existingJob) {
-      return res
-        .status(400)
-        .json({ status: "error", message: "Job Already Exists" });
-    }
-    const parentId = await Parents.findOne(req.decoded.email);
-    if (!parentId) {
-      return res.status(400).json({ status: "error", message: "unathuroized"});
-    }
-    const createJob = await Assignments.create({
-      creationJobID: undefined,
-      appliedJobID: 0,
-      childName: req.body.childName,
-      level: req.body.level,
-      subject: req.body.subject,
-      duration: req.body.duration,
-      frequency: req.body.frequency,
-      days: req.body.days,
-      rate: req.body.rate,
-      availability: undefined,
-    });
-    console.log("created Job", createJob);
-    res.json(createJob);
-  } catch (error) {
-    console.log("PUT /create", error);
-    res.status(400).json({ status: "error", message: "failed to create job" });
-  }
-});
+// router.put("/parent/create", auth, async (req, res) => {
+//   try {
+//     const existingJob = await Assignments.findOne({
+//       creationJobID: req.body.creationJobID,
+//     });
+//     if (existingJob) {
+//       return res
+//         .status(400)
+//         .json({ status: "error", message: "Job Already Exists" });
+//     }
+//     const parentId = await Parents.findOne({email: req.decoded.email});
+//     if (!parentId) {
+//       return res.status(400).json({ status: "error", message: "unathuroized"});
+//     }
+
+//     const createJob = await Assignments.create({
+//       parentJobID: undefined,
+//       // appliedJobID: 0,
+//       childName: req.body.childName,
+//       level: req.body.level,
+//       subject: req.body.subject,
+//       duration: req.body.duration,
+//       frequency: req.body.frequency,
+//       days: req.body.days,
+//       rate: req.body.rate,
+//       availability: undefined,
+//     });
+//     console.log("created Job", createJob);
+//     res.json(createJob);
+
+//   } catch (error) {
+//     console.log("PUT /create", error);
+//     res.status(400).json({ status: "error", message: "failed to create job" });
+//   }
+// });
+
+
+
 
 //READ CREATED JOBS
 router.get("/parent/created", auth, async (req, res) => {

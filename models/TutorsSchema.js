@@ -26,7 +26,8 @@ const TutorsSchema = new mongoose.Schema(
     phone: { type: String, required: true },
     address: { type: String, required: true },
     role: { type: String, default: "Tutor" },
-    appliedJobId: [{ type: Number, default: Date.now() }],
+    // applyJobID: {type: mongoose.Schema.Types.ObjectId, ref: "Assignments"}
+    // appliedJobId: [{ type: Number, default: Date.now() }],
   },
   { collection: "tutors" }
 );

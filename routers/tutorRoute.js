@@ -8,7 +8,6 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const Tutors = require("../models/TutorsSchema");
 const Parents = require("../models/ParentsSchema");
-const Assignments = require("../models/AssignmentsSchema");
 
 const auth = require("../middleware/auth");
 const { hash } = require("bcrypt");
@@ -31,13 +30,13 @@ router.put("/tutor/registration", async (req, res) => {
       edulevel: req.body.edulevel,
       phone: req.body.phone,
       address: req.body.address,
-      appliedJobId: 9
+      // appliedJobId: 9
     });
     console.log("created user", createdTutor);
     res.json({ status: "ok", message: "user created" });
   } catch (error) {
     console.log("PUT /create", error);
-    res.status(400),
+    res.status(400).
       json({ status: "error", message: "an error has occurred" });
   }
 });
@@ -155,6 +154,20 @@ router.patch("/tutor/registration", auth, async (req, res) => {
       message: "update profile not successful",
     });
   }
+});
+
+//Job apply 
+router.put("/tutor/apply", auth, async (req, res) => {
+  const jobApply = await Tutors.aggregate(
+    {
+    $lookup: {
+      from: "Assignments",
+      localField: "name",
+      foreignField: "parentName",
+      as: "Assignment"
+    }
+  });
+  res.json(jobApply);
 });
 
 //UPDATE PASSWORD -- IF GOT TIME THEN DO
