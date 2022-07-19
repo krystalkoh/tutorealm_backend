@@ -111,30 +111,31 @@ router.post("/parent/refresh", (req, res) => {
 //UPDATE (CREATE NEW ASSIGNMENT)
 //OLD
 router.patch("/parent/create", auth, async (req, res) => {
-  // console.log(req.body.assignments.childName);
+  // console.log(req.decoded.email);
+  console.log(req.body.childName);
   const createJob = await Parents.findOneAndUpdate(
     { email: req.decoded.email },
     {
-      $set: {
-        assignments: [{
-          // jobID: undefined,
-          childName: req.body.assignments.$.childName,
-          level: req.body.assignments.$.level,
-          subject: req.body.assignments.$.subject,
-          time: req.body.assignments.$.time,
-          rate: req.body.assignments.$.rate,
-          // availability: undefined
-        }]
-      },
-    }
+      $push: {
+        assignments: { 
+        childName: req.body.childName,
+        level: req.body.level,
+        subject: req.body.subject,
+        duration: req.body.duration,
+        frequency: req.body.frequency,
+        days: req.body.days,
+        rate: req.body.rate, 
+      }},
+    },
+    { new: true }
   );
-  console.log(req.body.assignments);
+  console.log(createJob);
   res.json(createJob);
 });
 
 //Assign parent name
-router.put("/parent/assignName", auth, async (req, res)=>{
-  const addName = await Assignments.find().populate("parentSourceName")
+router.put("/parent/assignName", auth, async (req, res) => {
+  const addName = await Assignments.find().populate("parentSourceName");
   console.log(addName);
   res.json(addName);
 });
@@ -175,9 +176,6 @@ router.put("/parent/assignName", auth, async (req, res)=>{
 //     res.status(400).json({ status: "error", message: "failed to create job" });
 //   }
 // });
-
-
-
 
 //READ CREATED JOBS
 router.get("/parent/created", auth, async (req, res) => {
