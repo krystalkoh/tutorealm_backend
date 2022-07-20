@@ -36,8 +36,7 @@ router.put("/tutor/registration", async (req, res) => {
     res.json({ status: "ok", message: "user created" });
   } catch (error) {
     console.log("PUT /create", error);
-    res.status(400).
-      json({ status: "error", message: "an error has occurred" });
+    res.status(400).json({ status: "error", message: "an error has occurred" });
   }
 });
 
@@ -110,19 +109,6 @@ router.post("/tutor/refresh", (req, res) => {
   }
 });
 
-//READ AVAILABLE JOBS
-router.get("/jobs", auth, async (req, res) => {
-  try {
-    const jobs = await Parents.find({ availability: true });
-    res.json(jobs);
-  } catch (error) {
-    res.status(401).json({
-      status: "error",
-      message: "can't find jobs",
-    });
-  }
-});
-
 //UPDATE PROFILE
 router.patch("/tutor/registration", auth, async (req, res) => {
   try {
@@ -156,19 +142,66 @@ router.patch("/tutor/registration", auth, async (req, res) => {
   }
 });
 
-//Job apply 
-router.put("/tutor/apply", auth, async (req, res) => {
-  const jobApply = await Tutors.aggregate(
-    {
-    $lookup: {
-      from: "Assignments",
-      localField: "name",
-      foreignField: "parentName",
-      as: "Assignment"
-    }
-  });
-  res.json(jobApply);
+// model.find('genre': {"$elemMatch": {name: "scifi", selected: true} })
+
+//READ AVAILABLE JOBS
+router.get("/tutor/jobs", auth, async (req, res) => {
+  try {
+    // const filter = { assignments: { $elemMatch: { availability: true } } };
+    // const jobs = await Parents.aggregate([{ $match: filter }]);
+    const jobs = await Parents.find({}, { assignments: 1, _id: 0 });
+    console.log(jobs);
+
+    res.json(jobs);
+  } catch (error) {
+    res.status(401).json({
+      status: "error",
+      message: "can't find jobs",
+    });
+  }
 });
+
+//APPLY JOB
+router.patch("/tutor/applied", auth, async (req, res) => {
+  try {
+    const jobs = await Parents.findOneAndUpdate(
+      { id: req.body.jobid },
+      {
+        $push: {
+          assignments: {
+            tutorsApplied: req.body.tutorid,
+          },
+        },
+      }
+    );
+    console.log(jobs);
+
+    const addApplied = await Tutors.findOneAndUpdate(
+      { email: req.decoded.email },
+      { $push: { jobsApplied: req.body.jobid } }
+    );
+    console.log(addApplied);
+
+    //return
+    // res.json(jobs);
+    // res.json(addApplied);
+  } catch (error) {
+    res.status(401).json({
+      status: "error",
+      message: "can't update job",
+    });
+  }
+});
+
+//READ APPLIED JOBs 
+
+//DELETE APPLIED JOBS
+// router.patch("tutor/applied", auth, async (req, res) => {});
+
+
+
+
+///below may not need
 
 //UPDATE PASSWORD -- IF GOT TIME THEN DO
 // hash: bcrypt.hash(req.body.password, 12) || user.hash, //double check better to separate the password from updating the profile
@@ -183,9 +216,6 @@ router.put("/tutor/apply", auth, async (req, res) => {
 //   const applied = await Tutors.find({ jobCode: { $exists: true, $ne: [] } });
 //   res.json(applied);
 // });
-
-//DELETE APPLIED JOBS
-// router.patch("tutor/applied", auth, async (req, res) => {});
 
 // READ (protected)
 // router.get("/users", auth, async (req, res) => {
