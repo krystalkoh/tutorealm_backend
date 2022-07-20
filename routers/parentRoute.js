@@ -133,6 +133,7 @@ router.patch("/create", auth, async (req, res) => {
   res.json(createJob);
 });
 
+
 // To show an array of assignment objects that have availability: true
 router.get("/assignments", auth, async (req, res) => {
   console.log(`accessing get assignments endpoint`);
@@ -221,16 +222,20 @@ router.patch("/availableJobs/approval", async (req, res) => {
 //EDITING JOB ASSIGNMENT PROPER
 router.patch("/availableJobs/edit", auth, async (req, res) => {
   try {
-    const user = await Parents.findOne({ email: req.decoded.email });
+    const jobEdit = await Parents.findOne({ email: req.decoded.email });
     const editJobs = await Parents.findOneAndUpdate(
-      { jobID: req.body.jobID },
+      { _id: "62d6532a898d27dc8df0df3f" },
       {
         $set: {
           assignments: {
             childName:
-              req.body.assignments.childName || user.assignments.childName,
-            level: req.body.assignments.level || user.assignments.level,
-            // subject:
+              req.body.childName || jobEdit.assignments.childName,
+              level: req.body.level || jobEdit.assignments.level,
+              subject: req.body.subject || jobEdit.assignments.subject,
+              duration: req.body.duration || jobEdit.assignments.duration,
+              frequency: req.body.frequency || jobEdit.assignments.frequency,
+              days: req.body.days || jobEdit.assignments.days,
+              rate: req.body.rate || jobEdit.assignments.rate
           },
         },
       },
@@ -246,9 +251,19 @@ router.patch("/availableJobs/edit", auth, async (req, res) => {
 });
 
 //DELETING JOB ASSIGNMENT
-// router.delete("/parent/removeJob", auth, async (req, res) => {
-//   const shredderMech = await Parents.delete();
-// });
+router.delete("/removeJob", auth, async (req, res) => {
+  //have to be re-written when front end can return ObjectId, otherwise to have it function, hard code an ID inside the param
+  try {
+    console.log({ _id: "62d64a5472cd619d0a6ec1e9" });
+    const shredderMech = await Parents.findByIdAndRemove({
+      _id: "62d64a5472cd619d0a6ec1e9",
+    });
+    res.json(shredderMech);
+  } catch (error) {
+    console.log("DELETE /", error);
+    res.status(401).json({ status: "error", message: "failed to delete" });
+  }
+});
 
 //READ TUTORS WHO APPLIED
 // router.get("/parent/tutorApplications", auth, async (req, res) => {
@@ -265,10 +280,8 @@ router.patch("/registration", auth, async (req, res) => {
   try {
     const parentUser = await Parents.findOne({ email: req.decoded.email });
     if (!parentUser) {
-      return res
-      .status(400)
-      .json({ status: "error", message: "unauthorized" });
-    };
+      return res.status(400).json({ status: "error", message: "unauthorized" });
+    }
     const updateParentProf = await Parents.findOneAndUpdate(
       { email: req.decoded.email },
       {
