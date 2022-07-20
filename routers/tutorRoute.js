@@ -109,6 +109,26 @@ router.post("/tutor/refresh", (req, res) => {
   }
 });
 
+
+//GET OLD PROFILE (JUST ADDED)
+router.get("/tutor/registration", auth, async (req, res) => {
+  try {
+    console.log(req.decoded);
+    const getProfile = await Tutors.findOne(
+      { email: req.decoded.email },
+      {},
+      { new: true }
+    );
+    res.json(getProfile);
+  } catch (error) {
+    console.log("POST/ refresh", error);
+    res.status(401).json({
+      status: "error",
+      message: "update profile not successful",
+    });
+  }
+});
+
 //UPDATE PROFILE
 router.patch("/tutor/registration", auth, async (req, res) => {
   try {
@@ -120,16 +140,14 @@ router.patch("/tutor/registration", auth, async (req, res) => {
       { email: req.decoded.email },
       {
         $set: {
-          email: req.body.email || user.email,
           gender: req.body.gender || user.gender,
           name: req.body.name || user.name,
           edulevel: req.body.edulevel || user.edulevel,
-          contact: {
-            phone: req.body.contact.phone || user.contact.phone,
-            address: req.body.contact.address || user.contact.address,
-          },
+          phone: req.body.phone || user.contact.phone,
+          address: req.body.address || user.contact.address,
         },
       },
+
       { new: true }
     );
     res.json(updateProfile);
@@ -181,9 +199,7 @@ router.patch("/tutor/applied", auth, async (req, res) => {
       { $push: { jobsApplied: req.body.jobid } }
     );
     console.log(addApplied);
-
-    //return
-    // res.json(jobs);
+    res.json(jobs);
     // res.json(addApplied);
   } catch (error) {
     res.status(401).json({
@@ -193,13 +209,10 @@ router.patch("/tutor/applied", auth, async (req, res) => {
   }
 });
 
-//READ APPLIED JOBs 
+//READ APPLIED JOBs
 
 //DELETE APPLIED JOBS
 // router.patch("tutor/applied", auth, async (req, res) => {});
-
-
-
 
 ///below may not need
 
