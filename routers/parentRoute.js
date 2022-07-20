@@ -29,7 +29,6 @@ router.put("/registration", async (req, res) => {
       phone: req.body.phone,
       address: req.body.address,
       role: undefined,
-      // jobCreationID: 0,
     });
     console.log("created user", createdParent);
     res.json({ status: "ok", message: "user created" });
@@ -134,7 +133,11 @@ router.patch("/create", auth, async (req, res) => {
   res.json(createJob);
 });
 
+<<<<<<< HEAD
 // For tutors: To show an array of assignment objects that have availability: true
+=======
+// To show an array of assignment objects that have availability: true. Read all jobs.
+>>>>>>> 7b6775e1b7068e8292b0bac9b05c074307702e28
 router.get("/assignments", auth, async (req, res) => {
   console.log(`accessing get assignments endpoint`);
   try {
@@ -168,7 +171,53 @@ router.get("/assignments", auth, async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 //UPDATE PERSONAL DETAILS (done)
+=======
+//TUTORS WHO CLICKED APPLY
+router.patch("/tutorApplied", (req, res) => {
+  //jobID from Parents collection will be pushed/populate into Tutors collection appliedJobID array.
+});
+
+// READ ALL TUTORS WHO APPLIED -- Need to access Tutors collection to retrieve jobID
+// router.post("/tutorsApplied/:id", auth, async (req, res) => {
+// });
+
+//UPDATE JOB ASSIGNMENT AVAILABLITY / true false, approving/rejecting application
+router.patch("/availableJobs/approval", async (req, res) => {
+});
+
+//DELETING JOB ASSIGNMENT
+router.delete("/removeJob", auth, async (req, res) => {
+  //req.body.id is the objectid from the assignment
+  try {
+  const testDel = await Parents.update(
+    {},
+    {
+      $pull: {
+        assignments: { _id: req.body.id},
+      },
+    },
+    { new: true }
+  );
+  console.log(testDel);
+  res.json({status: "green", message: "deleted" });
+  } catch (err) {
+    res.status(401).json({status: "error", message: "failed to delete" })
+  }
+});
+
+//READ TUTORS WHO APPLIED
+// router.get("/parent/tutorApplications", auth, async (req, res) => {
+//   const tutorApps = await Tutors.find//({tutor application key});
+// });
+
+//READ FULL TUTOR PROFILE
+//router.get("/parent/tutorProfileFull", ayth, async (req, res) => {
+// });
+
+//UPDATE PERSONAL DETAILS
+>>>>>>> 7b6775e1b7068e8292b0bac9b05c074307702e28
 router.patch("/registration", auth, async (req, res) => {
   try {
     const parentUser = await Parents.findOne({ email: req.decoded.email });
@@ -198,6 +247,7 @@ router.patch("/registration", auth, async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 //READ JOBS CREATED BY PARENTS (done)
 router.get("/created", auth, async (req, res) => {
   try {
@@ -263,5 +313,7 @@ router.delete("/removeJob/:id", auth, async (req, res) => {
 //router.get("/parent/tutorProfileFull", ayth, async (req, res) => {
 
 // })
+=======
+>>>>>>> 7b6775e1b7068e8292b0bac9b05c074307702e28
 
 module.exports = router;
