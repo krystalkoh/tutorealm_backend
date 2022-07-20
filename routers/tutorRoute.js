@@ -36,8 +36,7 @@ router.put("/tutor/registration", async (req, res) => {
     res.json({ status: "ok", message: "user created" });
   } catch (error) {
     console.log("PUT /create", error);
-    res.status(400).
-      json({ status: "error", message: "an error has occurred" });
+    res.status(400).json({ status: "error", message: "an error has occurred" });
   }
 });
 
@@ -110,15 +109,21 @@ router.post("/tutor/refresh", (req, res) => {
   }
 });
 
-//READ AVAILABLE JOBS
-router.get("/jobs", auth, async (req, res) => {
+//GET OLD PROFILE (JUST ADDED)
+router.get("/tutor/registration", auth, async (req, res) => {
   try {
-    const jobs = await Parents.find({ availability: true });
-    res.json(jobs);
+    console.log(req.decoded);
+    const getProfile = await Tutors.findOne(
+      { email: req.decoded.email },
+      {},
+      { new: true }
+    );
+    res.json(getProfile);
   } catch (error) {
+    console.log("POST/ refresh", error);
     res.status(401).json({
       status: "error",
-      message: "can't find jobs",
+      message: "update profile not successful",
     });
   }
 });
@@ -134,16 +139,14 @@ router.patch("/tutor/registration", auth, async (req, res) => {
       { email: req.decoded.email },
       {
         $set: {
-          email: req.body.email || user.email,
           gender: req.body.gender || user.gender,
           name: req.body.name || user.name,
           edulevel: req.body.edulevel || user.edulevel,
-          contact: {
-            phone: req.body.contact.phone || user.contact.phone,
-            address: req.body.contact.address || user.contact.address,
-          },
+          phone: req.body.phone || user.contact.phone,
+          address: req.body.address || user.contact.address,
         },
       },
+
       { new: true }
     );
     res.json(updateProfile);
@@ -156,19 +159,61 @@ router.patch("/tutor/registration", auth, async (req, res) => {
   }
 });
 
-//Job apply 
-router.put("/tutor/apply", auth, async (req, res) => {
-  const jobApply = await Tutors.aggregate(
-    {
-    $lookup: {
-      from: "Assignments",
-      localField: "name",
-      foreignField: "parentName",
-      as: "Assignment"
-    }
-  });
-  res.json(jobApply);
+// model.find('genre': {"$elemMatch": {name: "scifi", selected: true} })
+
+//READ AVAILABLE JOBS
+router.get("/tutor/jobs", auth, async (req, res) => {
+  try {
+    // const filter = { assignments: { $elemMatch: { availability: true } } };
+    // const jobs = await Parents.aggregate([{ $match: filter }]);
+    const jobs = await Parents.find({}, { assignments: 1, _id: 0 });
+    console.log(jobs);
+
+    res.json(jobs);
+  } catch (error) {
+    res.status(401).json({
+      status: "error",
+      message: "can't find jobs",
+    });
+  }
 });
+
+//APPLY JOB
+router.patch("/tutor/applied", auth, async (req, res) => {
+  try {
+    const jobs = await Parents.findOneAndUpdate(
+      { id: req.body.jobid },
+      {
+        $push: {
+          assignments: {
+            tutorsApplied: req.body.tutorid,
+          },
+        },
+      }
+    );
+    console.log(jobs);
+
+    const addApplied = await Tutors.findOneAndUpdate(
+      { email: req.decoded.email },
+      { $push: { jobsApplied: req.body.jobid } }
+    );
+    console.log(addApplied);
+    res.json(jobs);
+    // res.json(addApplied);
+  } catch (error) {
+    res.status(401).json({
+      status: "error",
+      message: "can't update job",
+    });
+  }
+});
+
+//READ APPLIED JOBs
+
+//DELETE APPLIED JOBS
+// router.patch("tutor/applied", auth, async (req, res) => {});
+
+///below may not need
 
 //UPDATE PASSWORD -- IF GOT TIME THEN DO
 // hash: bcrypt.hash(req.body.password, 12) || user.hash, //double check better to separate the password from updating the profile
@@ -183,9 +228,6 @@ router.put("/tutor/apply", auth, async (req, res) => {
 //   const applied = await Tutors.find({ jobCode: { $exists: true, $ne: [] } });
 //   res.json(applied);
 // });
-
-//DELETE APPLIED JOBS
-// router.patch("tutor/applied", auth, async (req, res) => {});
 
 // READ (protected)
 // router.get("/users", auth, async (req, res) => {
