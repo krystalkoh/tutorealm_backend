@@ -25,7 +25,7 @@ const TutorsSchema = new mongoose.Schema(
     },
     phone: { type: String, required: true },
     address: { type: String, required: true },
-    jobsApplied: [{ type: String }],
+    jobsApplied: { type: String },
     role: { type: String, default: "Tutor" },
   },
   { collection: "tutors" }

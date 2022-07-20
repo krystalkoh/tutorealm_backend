@@ -17,7 +17,8 @@ const ParentsSchema = new mongoose.Schema(
     },
     phone: { type: String, required: true },
     address: { type: String, required: true },
-    assignments: [{
+    assignments: [
+      {
         childName: {
           type: String,
           required: true,
@@ -45,12 +46,13 @@ const ParentsSchema = new mongoose.Schema(
           default: "select",
         },
         subject: [{ type: String, default: "" }],
-        duration: {type: String, default: ""}, 
-        frequency: {type: String, default: ""},
-        days: {type: String, default: "" },
+        duration: { type: String, default: "" },
+        frequency: { type: String, default: "" },
+        days: { type: String, default: "" },
         rate: { type: String, default: "" },
         availability: { type: Boolean, default: true },
-        tutorsApplied: [{ type: String, default: "No tutors applied" }],
+        tutorsApplied: { type: String, default: "No tutors applied" },
+        parentid: { type: String, default: "" },
       },
     ],
     role: { type: String, default: "Parent" },

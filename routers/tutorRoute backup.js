@@ -193,4 +193,35 @@
 // //   res.json(users);
 // // });
 
+//EDITING JOB ASSIGNMENT PROPER
+// router.patch("/availableJobs/edit", auth, async (req, res) => {
+//   try {
+//     const jobEdit = await Parents.findOne({ email: req.decoded.email });
+//     const editJobs = await Parents.findOneAndUpdate(
+//       { _id: "62d6532a898d27dc8df0df3f" },
+//       {
+//         $set: {
+//           assignments: {
+//             childName:
+//               req.body.childName || jobEdit.assignments.childName,
+//               level: req.body.level || jobEdit.assignments.level,
+//               subject: req.body.subject || jobEdit.assignments.subject,
+//               duration: req.body.duration || jobEdit.assignments.duration,
+//               frequency: req.body.frequency || jobEdit.assignments.frequency,
+//               days: req.body.days || jobEdit.assignments.days,
+//               rate: req.body.rate || jobEdit.assignments.rate
+//           },
+//         },
+//       },
+//       { new: true }
+//     );
+//     console.log("edit jobs", editJobs);
+//     res.json({ status: "ok", message: "edit successful" });
+//     res.json(editJobs);
+//   } catch (error) {
+//     console.log("PATCH /edit", error);
+//     res.status(401).json({ status: "error", message: "edit unsuccessful" });
+//   }
+// });
+
 // module.exports = router;
