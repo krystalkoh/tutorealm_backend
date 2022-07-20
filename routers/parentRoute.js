@@ -133,11 +133,8 @@ router.patch("/create", auth, async (req, res) => {
   res.json(createJob);
 });
 
-<<<<<<< HEAD
 // For tutors: To show an array of assignment objects that have availability: true
-=======
 // To show an array of assignment objects that have availability: true. Read all jobs.
->>>>>>> 7b6775e1b7068e8292b0bac9b05c074307702e28
 router.get("/assignments", auth, async (req, res) => {
   console.log(`accessing get assignments endpoint`);
   try {
@@ -171,9 +168,7 @@ router.get("/assignments", auth, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 //UPDATE PERSONAL DETAILS (done)
-=======
 //TUTORS WHO CLICKED APPLY
 router.patch("/tutorApplied", (req, res) => {
   //jobID from Parents collection will be pushed/populate into Tutors collection appliedJobID array.
@@ -217,7 +212,6 @@ router.delete("/removeJob", auth, async (req, res) => {
 // });
 
 //UPDATE PERSONAL DETAILS
->>>>>>> 7b6775e1b7068e8292b0bac9b05c074307702e28
 router.patch("/registration", auth, async (req, res) => {
   try {
     const parentUser = await Parents.findOne({ email: req.decoded.email });
@@ -247,7 +241,6 @@ router.patch("/registration", auth, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 //READ JOBS CREATED BY PARENTS (done)
 router.get("/created", auth, async (req, res) => {
   try {
@@ -313,7 +306,5 @@ router.delete("/removeJob/:id", auth, async (req, res) => {
 //router.get("/parent/tutorProfileFull", ayth, async (req, res) => {
 
 // })
-=======
->>>>>>> 7b6775e1b7068e8292b0bac9b05c074307702e28
 
 module.exports = router;
