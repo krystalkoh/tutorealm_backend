@@ -12,7 +12,7 @@ const Tutors = require("../models/TutorsSchema");
 const auth = require("../middleware/auth");
 const { hash } = require("bcrypt");
 
-//Parents-REGISTRATION
+//Parents REGISTRATION (done)
 router.put("/registration", async (req, res) => {
   try {
     const user = await Parents.findOne({ email: req.body.email });
@@ -39,7 +39,7 @@ router.put("/registration", async (req, res) => {
   }
 });
 
-//Parent-LOGIN
+//Parent-LOGIN (done)
 router.post("/login", async (req, res) => {
   try {
     const parent = await Parents.findOne({ email: req.body.email });
@@ -80,7 +80,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-//PARENT REFRESH TOKEN
+//PARENT REFRESH TOKEN (done)
 router.post("/refresh", (req, res) => {
   try {
     const decoded = jwt.verify(req.body.refresh, process.env.REFRESH_SECRET);
@@ -108,7 +108,7 @@ router.post("/refresh", (req, res) => {
   }
 });
 
-//UPDATE (CREATE NEW ASSIGNMENT)
+//UPDATE (CREATE NEW ASSIGNMENT) (done)
 router.patch("/create", auth, async (req, res) => {
   // console.log(req.decoded.email);
   // maybe throw in try {} catch () {}
@@ -133,23 +133,37 @@ router.patch("/create", auth, async (req, res) => {
   res.json(createJob);
 });
 
-//READ CREATED JOBS CHEAT CODE: NO FALSE ASSIGNMENTS
-router.get("/created", auth, async (req, res) => {
+// To show an array of assignment objects that have availability: true
+router.get("/assignments", auth, async (req, res) => {
   console.log(`accessing get assignments endpoint`);
   try {
     const createdJobList = await Parents.find({
-      "assignments.availability": true,
+      assignments: { $elemMatch: { availability: { $eq: true } } },
     });
     console.log(createdJobList);
 
-    // if (createdJobList.length > 0) {
-    res.json(createdJobList);
-    // } else {
-    //   res.json({ status: "warning", message: "no data found" });
-    // }
+    if (createdJobList.length > 0) {
+      // send only the assignments that are true:
+      const assignments = [];
+      createdJobList.forEach((element) => {
+        // go to every assignment object straight away
+        const assign = element.assignments;
+
+        // for of loop to check if availability is true
+        for (const item of assignments) {
+          // console.log(item)
+          if (item.availability === true) assignments.push(item);
+        }
+        console.log(assignments);
+      });
+
+      res.status(200).json({ assignments });
+    } else {
+      res.json({ status: "warning", message: "no data found" });
+    }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ status: "not ok", message: "error has occurred" });
+    res.status(500).json({ status: "error", message: "error has occurred" });
   }
 });
 
