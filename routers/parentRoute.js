@@ -124,6 +124,7 @@ router.patch("/create", auth, async (req, res) => {
           frequency: req.body.frequency,
           days: req.body.days,
           rate: req.body.rate,
+          parentid: req.decoded.id,
         },
       },
     },
@@ -132,7 +133,6 @@ router.patch("/create", auth, async (req, res) => {
   // console.log(createJob);
   res.json(createJob);
 });
-
 
 // To show an array of assignment objects that have availability: true
 router.get("/assignments", auth, async (req, res) => {
@@ -219,6 +219,14 @@ router.patch("/availableJobs/approval", async (req, res) => {
   res.json(updateJobs);
 });
 
+router.get("/created", auth, async (req, res) => {
+  const getJobs = await Parents.findOne(
+    { email: req.decoded.email },
+    { assignments: 1, _id: 0 }
+  );
+  res.json(getJobs);
+});
+
 //EDITING JOB ASSIGNMENT PROPER
 router.patch("/availableJobs/edit", auth, async (req, res) => {
   try {
@@ -228,14 +236,13 @@ router.patch("/availableJobs/edit", auth, async (req, res) => {
       {
         $set: {
           assignments: {
-            childName:
-              req.body.childName || jobEdit.assignments.childName,
-              level: req.body.level || jobEdit.assignments.level,
-              subject: req.body.subject || jobEdit.assignments.subject,
-              duration: req.body.duration || jobEdit.assignments.duration,
-              frequency: req.body.frequency || jobEdit.assignments.frequency,
-              days: req.body.days || jobEdit.assignments.days,
-              rate: req.body.rate || jobEdit.assignments.rate
+            childName: req.body.childName || jobEdit.assignments.childName,
+            level: req.body.level || jobEdit.assignments.level,
+            subject: req.body.subject || jobEdit.assignments.subject,
+            duration: req.body.duration || jobEdit.assignments.duration,
+            frequency: req.body.frequency || jobEdit.assignments.frequency,
+            days: req.body.days || jobEdit.assignments.days,
+            rate: req.body.rate || jobEdit.assignments.rate,
           },
         },
       },
