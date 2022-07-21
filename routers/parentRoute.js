@@ -180,26 +180,25 @@ router.patch("/tutorApplied", (req, res) => {
 // });
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY / true false, approving/rejecting application
-router.patch("/availableJobs/approval", async (req, res) => {
-});
+router.patch("/availableJobs/approval", async (req, res) => {});
 
 //DELETING JOB ASSIGNMENT
 router.delete("/removeJob", auth, async (req, res) => {
   //req.body.id is the objectid from the assignment
   try {
-  const testDel = await Parents.update(
-    {},
-    {
-      $pull: {
-        assignments: { _id: req.body.id},
+    const testDel = await Parents.update(
+      {},
+      {
+        $pull: {
+          assignments: { _id: req.body.id },
+        },
       },
-    },
-    { new: true }
-  );
-  console.log(testDel);
-  res.json({status: "green", message: "deleted" });
+      { new: true }
+    );
+    console.log(testDel);
+    res.json({ status: "green", message: "deleted" });
   } catch (err) {
-    res.status(401).json({status: "error", message: "failed to delete" })
+    res.status(401).json({ status: "error", message: "failed to delete" });
   }
 });
 
@@ -264,18 +263,24 @@ router.patch("/tutorApplied", (req, res) => {
 
 // READ ALL TUTORS WHO APPLIED -- Need to access Tutors collection to retrieve jobID
 router.get("/tutorsApplied/:id", auth, async (req, res) => {
-  console.log(`req.params.id`);
-  const tutorWhoApplied = await Tutors.find({}, { jobsApplied: req.params.id });
-  res.json(tutorWhoApplied);
+  console.log("accessing GET tutorsapplied endpoint");
+  console.log(req.params.id);
+  const tutorList = await Tutors.find({
+    jobsApplied: req.params.id,
+  });
+  console.log(tutorList);
+  res.json(tutorList);
 });
 
 //UPDATE JOB ASSIGNMENT AVAILABLITY / true false, approving/rejecting application
 router.patch("/availableJobs/approval", async (req, res) => {
-  const updateJobs = await Parents.findOneAndUpdate(
-    { jobID: req.body.jobID },
-    { availability: false }
-  );
-  res.json(updateJobs);
+  console.log(req.body.jobID);
+  res.json("ok")
+  // const updateJobs = await Parents.findOneAndUpdate(
+  //   { jobID: req.body.jobID },
+  //   { availability: false }
+  // );
+  // res.json(updateJobs);
 });
 
 //DELETING JOB ASSIGNMENT

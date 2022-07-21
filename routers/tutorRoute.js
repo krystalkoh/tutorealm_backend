@@ -14,6 +14,7 @@ const { hash } = require("bcrypt");
 
 //Tutors-REGISTRATION
 router.put("/registration", async (req, res) => {
+  console.log("accessing tutor reg endpoint");
   try {
     const user = await Tutors.findOne({ email: req.body.email });
     if (user) {
@@ -161,7 +162,7 @@ router.patch("/registration", auth, async (req, res) => {
 
 // model.find('genre': {"$elemMatch": {name: "scifi", selected: true} })
 
-// To show an array of assignment objects that have availability: true
+//READ AVAILABLE JOBS
 router.get("/assignments", auth, async (req, res) => {
   try {
     const createdJobList = await Parents.find({
@@ -194,7 +195,6 @@ router.get("/assignments", auth, async (req, res) => {
   }
 });
 
-//READ AVAILABLE JOBS
 // router.get("/jobs", auth, async (req, res) => {
 //   try {
 //     // const filter = { assignments: { $elemMatch: { availability: true } } };
@@ -213,14 +213,15 @@ router.get("/assignments", auth, async (req, res) => {
 
 //APPLY JOB
 router.patch("/applied", auth, async (req, res) => {
-  // console.log(`accessing applied endpoint`);
-  // console.log(req.body.parentid);
+  console.log(`accessing PATCH applied endpoint`);
+  console.log(req.body.parentid);
+
   try {
     const jobs = await Parents.findOneAndUpdate(
       { "assignments._id": req.body.parentid },
       {
         $set: {
-          "assignments.$": { tutorsApplied: req.decoded.email },
+          "assignments.$.tutorsApplied": req.decoded.email,
         },
       },
       { new: true }
@@ -247,6 +248,7 @@ router.patch("/applied", auth, async (req, res) => {
 
 //READ APPLIED JOB ID
 router.get("/applied/jobs", auth, async (req, res) => {
+  console.log("accessing GET applied jobs");
   try {
     const appliedIds = await Tutors.find(
       { email: req.decoded.email },
@@ -269,7 +271,9 @@ router.get("/applied/jobs", auth, async (req, res) => {
 });
 //GET APPLIED JOB ID
 router.post("/applied/allJobs", auth, async (req, res) => {
-  console.log(`end point accessed`);
+  console.log(`accessing POST applied/allJobs endpoint`);
+  console.log(req.body.appliedId);
+
   try {
     console.log(req.body.appliedId);
     const getJobs = await Parents.find(
